@@ -6,10 +6,11 @@ Pedro Hoerlle de Oliveira - 00288548
 
 %{
 #include "tokens.h"
+#include "hash.h"
 
 int getLineNumber (void);
-
 bool isRunning = true;
+
 %}
 
 /* Opcao do Flex para manter o numero da linha do lexema consumido */
@@ -60,14 +61,13 @@ return					{ return KW_RETURN; }
 "!="					{ return OPERATOR_DIF; }
 
 /* Identificadores */
-{ALFABETO_}+			{ return TK_IDENTIFIER; }
+{ALFABETO_}+			{ hashInsert(yytext,TK_IDENTIFIER); return TK_IDENTIFIER; }
 
 /* Literais */
-{DIGITO}+				{ return LIT_INTEGER; }
-"'"[ -~]"'"				{ return LIT_CHAR; } /* Aceita os caracteres da tabela ASCII entre o ESPACO e o TILDE, rejeitando outros tipos de entrada tipo NULL, BackSpace, Tab etc. 
-												Na especificacao nao fala nada sobre rejeitar essas entradas, mas faz mais sentido assim */
-{DIGITO}","{DIGITO}		{ return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
-"\s"					{ return LIT_STRING; } /* to do */
+{DIGITO}+				{ hashInsert(yytext,LIT_INTEGER); return LIT_INTEGER; }
+'[^']'					{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Aceita qualquer unico caractere a nao ser outra aspas simples, confirmado com o professor que TAB e ESPACO, etc fazem parte e que ''(vazio) nao faz parte*/
+{DIGITO}","{DIGITO}		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
+"\s"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; } /* to do */
 
 
 /* Comentarios */
@@ -87,6 +87,7 @@ return					{ return KW_RETURN; }
 
 %%
 
+#include "hash.c"
 #include "main.c"
 
 int yywrap(){
