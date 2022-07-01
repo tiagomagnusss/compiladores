@@ -8,23 +8,25 @@ Pedro Hoerlle de Oliveira - 00288548
 #include "tokens.h"
 #include "hash.h"
 
+int running = 1;
+
 int getLineNumber (void);
-bool isRunning = true;
+void initMe(void);
 
 %}
 
-/* Opcao do Flex para manter o numero da linha do lexema consumido */
+ /* Opcao do Flex para manter o numero da linha do lexema consumido */
 %option yylineno
 
 %x COMMENT
 
-/* Declaracao de Defines */
+ /* Declaracao de Defines */
 ALFABETO_	[a-zA-Z_]
 DIGITO		[0-9]
 
 %%
 
-/* Palavras Reservadas */
+ /* Palavras Reservadas */
 char					{ return KW_CHAR; }
 int						{ return KW_INT; }
 float					{ return KW_FLOAT; }
@@ -35,7 +37,7 @@ read					{ return KW_READ; }
 print					{ return KW_PRINT; }
 return					{ return KW_RETURN; }
 
-/* Caracteres Especiais */
+ /* Caracteres Especiais */
 ";"						{ return yytext[0]; }
 "("						{ return yytext[0]; }
 ")"						{ return yytext[0]; }
@@ -53,34 +55,33 @@ return					{ return KW_RETURN; }
 "|"						{ return yytext[0]; }
 "~"						{ return yytext[0]; }
 
-/* Operadores Compostos */
+ /* Operadores Compostos */
 "<-"					{ return ASSIGNMENT; }
 "<="					{ return OPERATOR_LE; }
 ">="					{ return OPERATOR_GE; }
 "=="					{ return OPERATOR_EQ; }
 "!="					{ return OPERATOR_DIF; }
 
-/* Identificadores */
+ /* Identificadores */
 {ALFABETO_}+			{ hashInsert(yytext,TK_IDENTIFIER); return TK_IDENTIFIER; }
 
-/* Literais */
+ /* Literais */
 {DIGITO}+				{ hashInsert(yytext,LIT_INTEGER); return LIT_INTEGER; }
 '[^']'					{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Aceita qualquer unico caractere a nao ser outra aspas simples, confirmado com o professor que TAB e ESPACO, etc fazem parte e que ''(vazio) nao faz parte*/
 {DIGITO}","{DIGITO}		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
 "\s"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; } /* to do */
 
-
-/* Comentarios */
+ /* Comentarios */
 "##".*					{ } /* Comentarios de uma linha */
 
-/* Comentarios de multiplas linhas */
+ /* Comentarios de multiplas linhas */
 "\#"					{ BEGIN(COMMENT); }
 
 <COMMENT>"#\\"			{ BEGIN(INITIAL); }
 <COMMENT>"\n"			{ } /* yylineno conta a linha quando o \n eh consumido */
 <COMMENT>.				{ }
 
-/* Outros */
+ /* Outros */
 [ \t\r]					{ }
 "\n"					{ } /* yylineno conta a linha quando o \n eh consumido */
 .						{ return TOKEN_ERROR; }
@@ -91,12 +92,14 @@ return					{ return KW_RETURN; }
 #include "main.c"
 
 int yywrap(){
-	isRunning = false;
+	running = 0;
 
 	return 1;
 }
 
-int getLineNumber()
-{
+int getLineNumber(){
 	return yylineno;
+}
+
+void initMe(void){
 }

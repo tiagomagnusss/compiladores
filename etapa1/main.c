@@ -1,6 +1,6 @@
 /*
 Trabalho Pratico de Compiladores
-Tiago ----
+Tiago de Carvalho Magnus - 00287710
 Pedro Hoerlle de Oliveira - 00288548
 */
 
