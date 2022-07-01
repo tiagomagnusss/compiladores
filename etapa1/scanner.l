@@ -19,6 +19,7 @@ void initMe(void);
 %option yylineno
 
 %x COMMENT
+%x STRING
 
  /* Declaracao de Defines */
 ALFABETO_	[a-zA-Z_]
@@ -75,11 +76,19 @@ return					{ return KW_RETURN; }
 "##".*					{ } /* Comentarios de uma linha */
 
  /* Comentarios de multiplas linhas */
-"\#"					{ BEGIN(COMMENT); }
+"\\#"					{ BEGIN(COMMENT); }
 
+"\""				{ BEGIN(STRING); return LIT_STRING;}
+
+ /* Comentarios de multiplas linhas */
 <COMMENT>"#\\"			{ BEGIN(INITIAL); }
 <COMMENT>"\n"			{ } /* yylineno conta a linha quando o \n eh consumido */
 <COMMENT>.				{ }
+
+<STRING>"\""			{ BEGIN(INITIAL); }
+<STRING>"\\\""		{ }
+<STRING>"\n"			{ }
+<STRING>.					{ }
 
  /* Outros */
 [ \t\r]					{ }
@@ -109,5 +118,5 @@ int isRunning(void){
 }
 
 void printLineNumber(void){
-	printf("%d\n", yylineno);
+	printf("%d\n", getLineNumber());
 }

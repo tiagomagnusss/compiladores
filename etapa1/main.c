@@ -7,6 +7,7 @@ Pedro Hoerlle de Oliveira - 00288548
 #include <stdio.h>
 #include <stdlib.h>
 #include "tokens.h"
+#include "hash.h"
 
 extern char *yytext;
 extern FILE *yyin;
@@ -57,4 +58,6 @@ int main(int argc, char** argv)
 			default: 			printf("%s ", yytext); break;
 		}
   }
+
+  hashPrint();
 }
