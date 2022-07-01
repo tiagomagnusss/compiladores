@@ -68,7 +68,7 @@ return					{ return KW_RETURN; }
  /* Literais */
 {DIGITO}+				{ hashInsert(yytext,LIT_INTEGER); return LIT_INTEGER; }
 '[^']'					{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Aceita qualquer unico caractere a nao ser outra aspas simples, confirmado com o professor que TAB e ESPACO, etc fazem parte e que ''(vazio) nao faz parte*/
-{DIGITO}","{DIGITO}		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
+{DIGITO}+,{DIGITO}+		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
 "\s"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; } /* to do */
 
  /* Comentarios */
@@ -102,4 +102,12 @@ int getLineNumber(){
 }
 
 void initMe(void){
+}
+
+int isRunning(void){
+	return running;
+}
+
+void printLineNumber(void){
+	printf("%d\n", yylineno);
 }

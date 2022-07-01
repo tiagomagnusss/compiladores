@@ -15,7 +15,7 @@ lex.yy.c: scanner.l
 	lex scanner.l
 
 clean:
-	rm lex.yy.c etapa1
+	rm -f lex.yy.c etapa1
 
 #Make 2
 # Makefile for two compiler calls
@@ -31,7 +31,7 @@ clean:
 #lex.yy.o: lex.yy.c
 #	gcc -c lex.yy.c
 #lex.yy.c: scanner.l
-#	flex --header-file=lex.yy.h scanner.l 
+#	flex --header-file=lex.yy.h scanner.l
 #clean:
 #	rm *.o lex.yy.c etapa1
 
@@ -50,6 +50,6 @@ clean:
 #lex.yy.o: lex.yy.c
 #	gcc -c lex.yy.c
 #lex.yy.c: scanner.l
-#	flex --header-file=lex.yy.h scanner.l 
+#	flex --header-file=lex.yy.h scanner.l
 #clean:
 #	rm *.o lex.yy.c etapa1
