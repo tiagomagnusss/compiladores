@@ -19,7 +19,6 @@ void initMe(void);
 %option yylineno
 
 %x COMMENT
-%x STRING
 
  /* Declaracao de Defines */
 ALFABETO_	[a-zA-Z_]
@@ -70,7 +69,6 @@ return					{ return KW_RETURN; }
 {DIGITO}+				{ hashInsert(yytext,LIT_INTEGER); return LIT_INTEGER; }
 '[^']'					{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Aceita qualquer unico caractere a nao ser outra aspas simples, confirmado com o professor que TAB e ESPACO, etc fazem parte e que ''(vazio) nao faz parte*/
 {DIGITO}+,{DIGITO}+		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
-"\s"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; } /* to do */
 
  /* Comentarios */
 "##".*					{ } /* Comentarios de uma linha */
@@ -78,17 +76,13 @@ return					{ return KW_RETURN; }
  /* Comentarios de multiplas linhas */
 "\\#"					{ BEGIN(COMMENT); }
 
-"\""				{ BEGIN(STRING); return LIT_STRING;}
+ /* String */
+\"(\\\"|[^\"\n])*\"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; }
 
  /* Comentarios de multiplas linhas */
 <COMMENT>"#\\"			{ BEGIN(INITIAL); }
 <COMMENT>"\n"			{ } /* yylineno conta a linha quando o \n eh consumido */
 <COMMENT>.				{ }
-
-<STRING>"\""			{ BEGIN(INITIAL); }
-<STRING>"\\\""		{ }
-<STRING>"\n"			{ }
-<STRING>.					{ }
 
  /* Outros */
 [ \t\r]					{ }
@@ -111,6 +105,7 @@ int getLineNumber(){
 }
 
 void initMe(void){
+	hashInit();
 }
 
 int isRunning(void){
