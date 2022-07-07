@@ -74,5 +74,4 @@ int main(int argc, char** argv)
   }
 
   hashPrint();
-  printLineNumber();
 }
