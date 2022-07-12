@@ -22,6 +22,9 @@
 %token LIT_STRING        286                       
 %token TOKEN_ERROR       290
 
+%left '+' '-'
+%left '*' '/'
+
 %%
 
 program: declist
@@ -43,7 +46,10 @@ plisttail: '.' plisttail
 	;
 
 expr: LIT_INTEGER
-	|
+	| IDENTIFIER
+	| expr '+' expr
+	| expr '-' expr
+	| '(' expr ')'
 
 %%
 

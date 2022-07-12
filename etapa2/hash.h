@@ -11,6 +11,9 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #define HASH_SIZE 997
 
+#define SYMBOL_IDENTIFIER 1
+#define SYMBOL_LIT_INT 2
+
 typedef struct hash_node
 {
     int type;
