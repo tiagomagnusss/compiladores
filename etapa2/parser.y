@@ -46,12 +46,56 @@ void yyerror (char const *);
 
 %%
 
-program: declist
+program: lista_dec
+	| %empty
 	;
 
-declist: dec declist
+lista_dec: dec lista_dec
 	| dec
 	;
+
+dec: tipo TK_IDENTIFIER '(' valor ')' ';'
+	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao ';'
+	| funcao
+	| bloco ';'
+	| cmd_simples
+	;
+
+inicializacao: valor inicializacao
+	| %empty
+	;
+
+funcao: cabecalho corpo
+	;
+
+cabecalho: tipo TK_IDENTIFIER parametros
+	;
+
+parametros: tipo TK_IDENTIFIER
+	;
+
+corpo: bloco
+	;
+
+bloco: '{' seq_cmd_bloco resto '}'
+	| %empty
+	;
+
+resto: ';' seq_cmd_bloco resto
+	| %empty
+	;
+
+tipo: KW_CHAR
+	| KW_INT
+	| KW_FLOAT
+	;
+
+valor: LIT_INTEGER
+	| LIT_FLOAT
+	| LIT_CHAR
+	;
+
+
 
 dec: KW_INT TK_IDENTIFIER '=' LIT_INTEGER ';'
 	;
