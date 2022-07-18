@@ -9,17 +9,17 @@
 # In our case, you probably need #include "hash.c" at the beginning
 # and #include "main.c" in the last part of the scanner.l
 
-etapa2: lex.yy.c y.tab.c  main.c
-	gcc -Wall -o etapa2 lex.yy.c
+etapa2: y.tab.c lex.yy.c
+	gcc -Wall -o etapa2 y.tab.c lex.yy.c
 
 y.tab.c: parser.y
 	yacc -d parser.y
 
 lex.yy.c: scanner.l
-	lex scanner.l
+	flex scanner.l
 
 clean:
-	rm -f lex.yy.c etapa2
+	rm -f lex.yy.c y.tab.* etapa2
 
 #Make 2
 # Makefile for two compiler calls
