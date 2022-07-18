@@ -46,12 +46,11 @@ void yyerror (char const *);
 
 %%
 
-program: lista_dec
-	| %empty
+programa: lista_dec
 	;
 
 lista_dec: dec lista_dec
-	| dec
+	| /* empty */
 	;
 
 dec: tipo TK_IDENTIFIER '(' valor ')' ';'
@@ -62,7 +61,7 @@ dec: tipo TK_IDENTIFIER '(' valor ')' ';'
 	;
 
 inicializacao: valor inicializacao
-	| %empty
+	| /* empty */
 	;
 
 funcao: cabecalho corpo
@@ -78,11 +77,11 @@ corpo: bloco
 	;
 
 bloco: '{' seq_cmd_bloco resto '}'
-	| %empty
+	| /* empty */
 	;
 
 resto: ';' seq_cmd_bloco resto
-	| %empty
+	| /* empty */
 	;
 
 tipo: KW_CHAR
@@ -95,7 +94,11 @@ valor: LIT_INTEGER
 	| LIT_CHAR
 	;
 
+cmd_simples: /* empty */
+	;
 
+seq_cmd_bloco: /* empty */
+	;
 
 dec: KW_INT TK_IDENTIFIER '=' LIT_INTEGER ';'
 	;
