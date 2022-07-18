@@ -1,0 +1,36 @@
+identificador_A
+1231
+2.5
+2,5
+222,5
+222,555
+2,555
+2,
+5
+
+'t'
+' '
+'''
+identificador_AA'
+'h'
+'	'
+'\n'
+
+#identificador_B
+##asdsada   comentario
+9876 ##weoiru inteiro e comentario
+\# comentario de varias linhas
+comentario de   varias linhas
+comentario de varias linhas#\ identificador_C
+#\ identificador_D \# comentario.""\"\n comentario #\
+\\ identificador_E
+#\\ identifidor_F
+#\ identificador_G
+
+"string_1"
+""
+"""
+identificador_H"
+"string_5\""
+"\n\"\"\n string_6"
+"   . 's'tring_7"
