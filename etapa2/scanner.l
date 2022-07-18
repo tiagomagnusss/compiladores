@@ -5,23 +5,28 @@ Pedro Hoerlle de Oliveira - 00288548
 */
 
 %{
-#include "tokens.h"
+
 #include "y.tab.h"
 #include "hash.h"
 
 int running = 1;
 
 int getLineNumber (void);
-void initMe(void);
+void initMe (void);
+int isRunning (void);
 
 %}
 
- /* Opcao do Flex para manter o numero da linha do lexema consumido */
+/* Opcao do Flex para manter o numero da linha do lexema consumido */
 %option yylineno
+
+/* Opcao do Flex para nao gerar codigo que nao eh utilizado e causa warnings */
+%option nounput
+%option noinput
 
 %x COMMENT
 
- /* Declaracao de Defines */
+/* Declaracao de Defines */
 ALFABETO_	[a-zA-Z_]
 DIGITO		[0-9]
 
@@ -68,52 +73,49 @@ return					{ return KW_RETURN; }
 
  /* Literais */
 {DIGITO}+				{ hashInsert(yytext,LIT_INTEGER); return LIT_INTEGER; }
-'[^']'					{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Aceita qualquer unico caractere a nao ser outra aspas simples, confirmado com o professor que TAB e ESPACO, etc fazem parte e que ''(vazio) nao faz parte*/
-{DIGITO}+,{DIGITO}+		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* ESPECIFICACAO: ?? oq seriam exatamente literais decimais ?? Supus que sao um digito unico, ??ou seja 22,5 e 2,55 nao sao float, n faz sentido?? */
+'[^'\n]'				{ hashInsert(yytext,LIT_CHAR); return LIT_CHAR; } /* Confirmado ''(vazio) e quebra de linha nao faz parte*/
+{DIGITO}+,{DIGITO}+		{ hashInsert(yytext,LIT_FLOAT); return LIT_FLOAT; } /* Literais Decimais sao a mesma coisa que inteiros */
 
- /* Comentarios */
-"##".*					{ } /* Comentarios de uma linha */
+ /* String */
+\"([^\\"\n]|\\.)*\"		{ hashInsert(yytext,LIT_STRING); return LIT_STRING; } /* Confirmado string vazia eh valida e multilinha nao */
+
+ /* Comentarios de uma linha */
+"##".*					{ }
 
  /* Comentarios de multiplas linhas */
 "\\#"					{ BEGIN(COMMENT); }
 
- /* String */
-\"(\\\"|[^\"\n])*\"					{ hashInsert(yytext,LIT_STRING); return LIT_STRING; }
-
- /* Comentarios de multiplas linhas */
 <COMMENT>"#\\"			{ BEGIN(INITIAL); }
 <COMMENT>"\n"			{ } /* yylineno conta a linha quando o \n eh consumido */
 <COMMENT>.				{ }
 
  /* Outros */
-[ \t\r]					{ }
+[ \t\r]					{ } /* ESPACO, TAB e CARRIAGE RETURN */
 "\n"					{ } /* yylineno conta a linha quando o \n eh consumido */
 .						{ return TOKEN_ERROR; }
 
 %%
 
 #include "hash.c"
-#include "y.tab.c"
 #include "main.c"
 
-int yywrap(){
+int yywrap(void)
+{
 	running = 0;
-
 	return 1;
 }
 
-int getLineNumber(){
+int getLineNumber(void)
+{
 	return yylineno;
 }
 
-void initMe(void){
+void initMe(void)
+{
 	hashInit();
 }
 
-int isRunning(void){
+int isRunning(void)
+{
 	return running;
-}
-
-void printLineNumber(void){
-	printf("%d\n", getLineNumber());
 }
