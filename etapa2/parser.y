@@ -1,26 +1,45 @@
-%token KW_CHAR           256
-%token KW_INT            257
-%token KW_FLOAT          258
-%token KW_IF             261
-%token KW_ELSE           263
-%token KW_WHILE          264
-%token KW_READ           266
-%token KW_PRINT          267
-%token KW_RETURN         268
+/*
+Trabalho Pratico de Compiladores
+Tiago de Carvalho Magnus - 00287710
+Pedro Hoerlle de Oliveira - 00288548
+*/
 
-%token ASSIGNMENT        269
-%token OPERATOR_LE       270
-%token OPERATOR_GE       271
-%token OPERATOR_EQ       272
-%token OPERATOR_DIF      273
+%{
 
-%token TK_IDENTIFIER     280
+#include <stdio.h>
+#include <stdlib.h>
 
-%token LIT_INTEGER       281
-%token LIT_FLOAT         282
-%token LIT_CHAR          285
-%token LIT_STRING        286                       
-%token TOKEN_ERROR       290
+int yylex (void);
+int getLineNumber (void);
+
+/* Declaracao correta de yyerror segundo manual */
+void yyerror (char const *);
+
+%}
+
+%token KW_CHAR
+%token KW_INT
+%token KW_FLOAT
+%token KW_IF
+%token KW_ELSE
+%token KW_WHILE
+%token KW_READ
+%token KW_PRINT
+%token KW_RETURN
+
+%token ASSIGNMENT
+%token OPERATOR_LE
+%token OPERATOR_GE
+%token OPERATOR_EQ
+%token OPERATOR_DIF
+
+%token TK_IDENTIFIER
+
+%token LIT_INTEGER
+%token LIT_FLOAT
+%token LIT_CHAR
+%token LIT_STRING
+%token TOKEN_ERROR
 
 %left '+' '-'
 %left '*' '/'
@@ -46,14 +65,15 @@ plisttail: '.' plisttail
 	;
 
 expr: LIT_INTEGER
-	| IDENTIFIER
+	| TK_IDENTIFIER
 	| expr '+' expr
 	| expr '-' expr
 	| '(' expr ')'
 
 %%
 
-int yyerror() {
-	fprintf(stderr, "YY error at %d\n", getLineNumber());
+void yyerror (char const *s)
+{
+	fprintf(stderr, "%s at line %d\n", s, getLineNumber());
 	exit(3);
 }
