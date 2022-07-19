@@ -53,9 +53,10 @@ lista_dec: dec lista_dec
 	| /* empty */
 	;
 
-dec: tipo TK_IDENTIFIER '(' valor ')' ';'
-	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao ';'
-	| funcao
+dec: tipo TK_IDENTIFIER '(' valor ')' 										';'
+	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao  ';'
+	| tipo TK_IDENTIFIER ASSIGNMENT expr 									  ';'
+	| tipo TK_IDENTIFIER '(' lista_params ')'	bloco					';'
 	| bloco ';'
 	| cmd_simples
 	;
@@ -64,23 +65,22 @@ inicializacao: valor inicializacao
 	| /* empty */
 	;
 
-funcao: cabecalho corpo
-	;
-
-cabecalho: tipo TK_IDENTIFIER parametros
-	;
-
-parametros: tipo TK_IDENTIFIER
-	;
-
-corpo: bloco
-	;
-
 bloco: '{' seq_cmd_bloco resto '}'
 	| /* empty */
 	;
 
 resto: ';' seq_cmd_bloco resto
+	| /* empty */
+	;
+
+lista_params: param resto_params
+	| /* empty */
+	;
+
+param: tipo TK_IDENTIFIER
+	;
+
+resto_params: param resto_params
 	| /* empty */
 	;
 
@@ -94,28 +94,66 @@ valor: LIT_INTEGER
 	| LIT_CHAR
 	;
 
-cmd_simples: /* empty */
+cmd_simples: cmd_atrib
+	| cmd_if
+	| cmd_while
+	| cmd_print
+	| cmd_read
+	| cmd_return
 	;
 
-seq_cmd_bloco: /* empty */
+cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr ';'
+	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr ';'
 	;
 
-dec: KW_INT TK_IDENTIFIER '=' LIT_INTEGER ';'
+cmd_if: KW_IF '(' expr ')' bloco cmd_else
 	;
 
-plist: expr plisttail
-	|
+cmd_else: KW_ELSE bloco
+	| /* empty */
 	;
 
-plisttail: '.' plisttail
-	|
+cmd_while: KW_WHILE '(' expr ')' bloco
+	;
+
+cmd_print: KW_PRINT print_args ';'
+	;
+
+cmd_read: KW_READ '(' TK_IDENTIFIER ')' ';'
+	;
+
+cmd_return: KW_RETURN '(' expr ')' ';'
+	;
+
+seq_cmd_bloco: cmd_simples seq_cmd_bloco
+	| /* empty */
+	;
+
+print_args: expr print_args
+	| LIT_STRING print_args
+	| TK_IDENTIFIER '[' expr ']'
+	| /* empty */
 	;
 
 expr: LIT_INTEGER
+	| LIT_FLOAT
+	| LIT_CHAR
 	| TK_IDENTIFIER
 	| expr '+' expr
 	| expr '-' expr
+	| expr '*' expr
+	| expr '/' expr
+	| expr '.' expr
+	| expr '<' expr
+	| expr '>' expr
 	| '(' expr ')'
+	| expr OPERATOR_LE expr
+	| expr OPERATOR_GE expr
+	| expr OPERATOR_EQ expr
+	| expr OPERATOR_DIF expr
+	| expr '&' expr
+	| expr '|' expr
+	| expr '~' expr
 
 %%
 
