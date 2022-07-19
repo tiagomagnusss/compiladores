@@ -41,6 +41,8 @@ void yyerror (char const *);
 %token LIT_STRING
 %token TOKEN_ERROR
 
+%left '|' '&' '~'
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '+' '-'
 %left '*' '/'
 
@@ -54,10 +56,10 @@ lista_dec: dec lista_dec
 	;
 
 dec: tipo TK_IDENTIFIER '(' valor ')' 										';'
-	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao  ';'
-	| tipo TK_IDENTIFIER ASSIGNMENT expr 									  ';'
-	| tipo TK_IDENTIFIER '(' lista_params ')'	bloco					';'
-	| bloco ';'
+	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao					';'
+	| tipo TK_IDENTIFIER ASSIGNMENT expr									';'
+	| tipo TK_IDENTIFIER '(' lista_params ')'	bloco						';'
+	| bloco																	';'
 	| cmd_simples
 	;
 
@@ -119,7 +121,8 @@ cmd_while: KW_WHILE '(' expr ')' bloco
 cmd_print: KW_PRINT print_args ';'
 	;
 
-cmd_read: KW_READ '(' TK_IDENTIFIER ')' ';'
+cmd_read: KW_READ TK_IDENTIFIER ';'
+	| KW_READ TK_IDENTIFIER '[' expr ']' ';'
 	;
 
 cmd_return: KW_RETURN '(' expr ')' ';'
