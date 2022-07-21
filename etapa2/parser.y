@@ -42,7 +42,7 @@ void yyerror (char const *);
 %token TOKEN_ERROR
 
 %left '|' '&' '~'
-%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
+%left '<' '>' '.' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '+' '-'
 %left '*' '/'
 
@@ -58,25 +58,27 @@ lista_dec: dec lista_dec
 dec: tipo TK_IDENTIFIER '(' valor ')' 										';'
 	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao					';'
 	| tipo TK_IDENTIFIER ASSIGNMENT expr									';'
-	| tipo TK_IDENTIFIER '(' lista_params ')'	bloco
-	| bloco																	';'
-	| cmd_simples
+	| tipo TK_IDENTIFIER '(' lista_params ')' bloco					
 	;
 
 inicializacao: valor inicializacao
 	| /* empty */
 	;
 
-seq_cmd_bloco: cmd_simples seq_cmd_bloco
-	| bloco
+valor: LIT_INTEGER
+	| LIT_FLOAT
+	| LIT_CHAR
+	| TK_IDENTIFIER
+	;
+
+lista_valores: expr lista_valores
 	| /* empty */
 	;
 
-bloco: '{' seq_cmd_bloco resto '}'
-	| /* empty */
+bloco: '{' cmd_simples resto '}'
 	;
 
-resto: ';' seq_cmd_bloco resto
+resto: ';' cmd_simples resto
 	| /* empty */
 	;
 
@@ -96,36 +98,28 @@ tipo: KW_CHAR
 	| KW_FLOAT
 	;
 
-lista_valores: valor lista_valores
-	| /* empty */
-	;
-
-valor: LIT_INTEGER
-	| LIT_FLOAT
-	| LIT_CHAR
-	| TK_IDENTIFIER
-	;
-
 cmd_simples: cmd_atrib
 	| cmd_if
 	| cmd_while
 	| cmd_print
 	| cmd_read
 	| cmd_return
-	;
-
-cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr ';'
-	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr ';'
-	;
-
-cmd_if: KW_IF '(' expr ')' bloco cmd_else
-	;
-
-cmd_else: KW_ELSE bloco
+	| bloco
 	| /* empty */
 	;
 
-cmd_while: KW_WHILE '(' expr ')' bloco
+cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr
+	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr
+	;
+
+cmd_if: KW_IF '(' expr ')' cmd_simples cmd_else
+	;
+
+cmd_else: KW_ELSE cmd_simples
+	| /* empty */
+	;
+
+cmd_while: KW_WHILE '(' expr ')' cmd_simples
 	;
 
 cmd_print: KW_PRINT print_args
@@ -139,7 +133,6 @@ cmd_return: KW_RETURN expr
 
 print_args: expr print_args
 	| LIT_STRING print_args
-	| ';'
 	| /* empty */
 	;
 
@@ -150,8 +143,8 @@ vindentifier: TK_IDENTIFIER
 expr: LIT_INTEGER
 	| LIT_FLOAT
 	| LIT_CHAR
-	| TK_IDENTIFIER '(' lista_valores ')'
 	| vindentifier
+	| TK_IDENTIFIER '(' lista_valores ')'
 	| expr '+' expr
 	| expr '-' expr
 	| expr '*' expr
