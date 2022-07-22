@@ -57,8 +57,7 @@ lista_dec: dec lista_dec
 
 dec: tipo TK_IDENTIFIER '(' valor ')' 										';'
 	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao					';'
-	| tipo TK_IDENTIFIER ASSIGNMENT expr									';'
-	| tipo TK_IDENTIFIER '(' lista_params ')' bloco					
+	| tipo TK_IDENTIFIER '(' lista_params ')' bloco
 	;
 
 inicializacao: valor inicializacao
@@ -71,7 +70,7 @@ valor: LIT_INTEGER
 	| TK_IDENTIFIER
 	;
 
-lista_valores: expr lista_valores
+lista_argumentos: expr lista_argumentos
 	| /* empty */
 	;
 
@@ -122,29 +121,32 @@ cmd_else: KW_ELSE cmd_simples
 cmd_while: KW_WHILE '(' expr ')' cmd_simples
 	;
 
-cmd_print: KW_PRINT print_args
+cmd_print: KW_PRINT lista_elementos
 	;
 
-cmd_read: KW_READ vindentifier
+cmd_read: KW_READ TK_IDENTIFIER index
+	;
+
+index: '[' expr ']'
+	| /* empty */
 	;
 
 cmd_return: KW_RETURN expr
 	;
 
-print_args: expr print_args
-	| LIT_STRING print_args
-	| /* empty */
+lista_elementos: LIT_STRING resto_print
+	| expr resto_print
 	;
 
-vindentifier: TK_IDENTIFIER
-	| TK_IDENTIFIER '[' expr ']'
+resto_print: lista_elementos
+	| /* empty */
 	;
 
 expr: LIT_INTEGER
 	| LIT_FLOAT
 	| LIT_CHAR
-	| vindentifier
-	| TK_IDENTIFIER '(' lista_valores ')'
+	| TK_IDENTIFIER index
+	| TK_IDENTIFIER '(' lista_argumentos ')'
 	| expr '+' expr
 	| expr '-' expr
 	| expr '*' expr
