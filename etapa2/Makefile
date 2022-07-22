@@ -19,7 +19,7 @@ lex.yy.c: scanner.l
 	flex scanner.l
 
 clean:
-	rm -f lex.yy.c y.tab.* etapa2
+	rm -f lex.yy.c y.tab.* y.output etapa2
 
 #Make 2
 # Makefile for two compiler calls
