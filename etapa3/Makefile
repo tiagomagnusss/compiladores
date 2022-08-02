@@ -9,17 +9,17 @@
 # In our case, you probably need #include "hash.c" at the beginning
 # and #include "main.c" in the last part of the scanner.l
 
-etapa2: y.tab.c lex.yy.c
-	gcc -Wall -o etapa2 y.tab.c lex.yy.c
-
-y.tab.c: parser.y
-	yacc -d parser.y
-
-lex.yy.c: scanner.l
-	flex scanner.l
-
-clean:
-	rm -f lex.yy.c y.tab.* y.output etapa2
+#etapa2: y.tab.c lex.yy.c
+#	gcc -Wall -o etapa2 y.tab.c lex.yy.c
+#
+#y.tab.c: parser.y
+#	yacc -d parser.y
+#
+#lex.yy.c: scanner.l
+#	flex scanner.l
+#
+#clean:
+#	rm -f lex.yy.c y.tab.* y.output etapa2
 
 #Make 2
 # Makefile for two compiler calls
@@ -45,15 +45,29 @@ clean:
 # But now the hash table is compiled in a separate gcc call
 # Therefore, there must be a header of it to be included in scanner.l
 
-#etapa1: lex.yy.o main.o hash.o
-#	gcc -o etapa1 lex.yy.o main.o hash.o
-#main.o: main.c
-#	gcc -c main.c
-#hash.o: hash.c
-#	gcc -c hash.c
-#lex.yy.o: lex.yy.c
-#	gcc -c lex.yy.c
-#lex.yy.c: scanner.l
-#	flex --header-file=lex.yy.h scanner.l
-#clean:
-#	rm *.o lex.yy.c etapa1
+etapa3: y.tab.o lex.yy.o hash.o ast.o main.o
+	gcc -Wall main.o lex.yy.o y.tab.o hash.o ast.o -o etapa3
+
+main.o: main.c
+	gcc -Wall -c main.c
+
+hash.o: hash.c
+	gcc -Wall -c hash.c
+
+ast.o: ast.c
+	gcc -Wall -c ast.c
+
+y.tab.o: y.tab.c
+	gcc -Wall -c y.tab.c
+
+lex.yy.o: lex.yy.c
+	gcc -Wall -c lex.yy.c
+
+y.tab.c: parser.y
+	yacc -d parser.y
+
+lex.yy.c: scanner.l
+	flex --header-file=lex.yy.h scanner.l
+
+clean:
+	rm lex.yy.c lex.yy.h y.tab.c y.tab.h *.o etapa3
