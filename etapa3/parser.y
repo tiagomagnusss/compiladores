@@ -9,6 +9,9 @@ Pedro Hoerlle de Oliveira - 00288548
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "hash.h"
+#include "ast.h"
+
 int yylex (void);
 int getLineNumber (void);
 
@@ -16,6 +19,12 @@ int getLineNumber (void);
 void yyerror (char const *);
 
 %}
+
+%union
+{
+	HASH_NODE *symbol;
+	//AST *ast;
+}
 
 %token KW_CHAR
 %token KW_INT
@@ -33,12 +42,12 @@ void yyerror (char const *);
 %token OPERATOR_EQ
 %token OPERATOR_DIF
 
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEGER
-%token LIT_FLOAT
-%token LIT_CHAR
-%token LIT_STRING
+%token<symbol> LIT_INTEGER
+%token<symbol> LIT_FLOAT
+%token<symbol> LIT_CHAR
+%token<symbol> LIT_STRING
 %token TOKEN_ERROR
 
 %left '|' '&' '~'
@@ -167,6 +176,6 @@ expr: LIT_INTEGER
 
 void yyerror (char const *s)
 {
-	fprintf(stderr, "%s at line %d\n", s, getLineNumber());
-	exit(3);
+	fprintf (stderr, "%s at line %d\n", s, getLineNumber ());
+	exit (3);
 }
