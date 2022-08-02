@@ -8,6 +8,8 @@ Pedro Hoerlle de Oliveira - 00288548
 #define HASH_HEADER
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define HASH_SIZE 997
 
@@ -21,10 +23,10 @@ typedef struct hash_node
     struct hash_node * next;
 } HASH_NODE;
 
-void hashInit(void);
-int hashAddress(char *text);
-HASH_NODE *hashFind(char *text);
-HASH_NODE *hashInsert(char *text, int type);
-void hashPrint(void);
+void hashInit (void);
+int hashAddress (char *text);
+HASH_NODE *hashFind (char *text);
+HASH_NODE *hashInsert (char *text, int type);
+void hashPrint (void);
 
 #endif

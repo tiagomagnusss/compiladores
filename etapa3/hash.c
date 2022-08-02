@@ -6,16 +6,16 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #include "hash.h"
 
-HASH_NODE*Table[HASH_SIZE];
+HASH_NODE *Table[HASH_SIZE];
 
-void hashInit(void)
+void hashInit (void)
 {
     int i;
     for (i=0; i<HASH_SIZE; ++i)
         Table[i]=0;
 }
 
-int hashAddress(char *text)
+int hashAddress (char *text)
 {
     int address = 1;
     int i;
@@ -24,7 +24,7 @@ int hashAddress(char *text)
     return address-1;
 }
 
-HASH_NODE *hashFind(char *text)
+HASH_NODE *hashFind (char *text)
 {
     HASH_NODE *node;
     int address = hashAddress(text);
@@ -34,7 +34,7 @@ HASH_NODE *hashFind(char *text)
 return 0;
 }
 
-HASH_NODE *hashInsert(char *text, int type)
+HASH_NODE *hashInsert (char *text, int type)
 {
     HASH_NODE *newnode;
     int address = hashAddress(text);
@@ -50,11 +50,11 @@ HASH_NODE *hashInsert(char *text, int type)
     return newnode;
 }
 
-void hashPrint(void)
+void hashPrint (void)
 {
     int i;
     HASH_NODE *node;
     for (i=0; i<HASH_SIZE; ++i)
         for (node=Table[i]; node; node = node->next)
-            printf("Table[%d] has %s\n",i,node->text);
+            printf ("Table[%d] has %s\n",i,node->text);
 }
