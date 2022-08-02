@@ -6,9 +6,6 @@ Pedro Hoerlle de Oliveira - 00288548
 
 %{
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "hash.h"
 #include "ast.h"
 
@@ -23,7 +20,7 @@ void yyerror (char const *);
 %union
 {
 	HASH_NODE *symbol;
-	//AST *ast;
+	AST *ast;
 }
 
 %token KW_CHAR
@@ -50,10 +47,12 @@ void yyerror (char const *);
 %token<symbol> LIT_STRING
 %token TOKEN_ERROR
 
+%type<ast> expr
+
 %left '|' '&' '~'
-%left '<' '>' '.' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '+' '-'
-%left '*' '/'
+%left '.' '/'
 
 %%
 
@@ -116,7 +115,7 @@ cmd_simples: cmd_atrib
 	| /* empty */
 	;
 
-cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr
+cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr			{ astPrint ($3, 0); }
 	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr
 	;
 
@@ -151,26 +150,25 @@ resto_print: lista_elementos
 	| /* empty */
 	;
 
-expr: LIT_INTEGER
-	| LIT_FLOAT
-	| LIT_CHAR
-	| TK_IDENTIFIER index
-	| TK_IDENTIFIER '(' lista_argumentos ')'
-	| expr '+' expr
-	| expr '-' expr
-	| expr '*' expr
-	| expr '/' expr
-	| expr '.' expr
-	| expr '<' expr
-	| expr '>' expr
-	| '(' expr ')'
-	| expr OPERATOR_LE expr
-	| expr OPERATOR_GE expr
-	| expr OPERATOR_EQ expr
-	| expr OPERATOR_DIF expr
-	| expr '&' expr
-	| expr '|' expr
-	| '~' expr
+expr: LIT_INTEGER									{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_FLOAT										{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_CHAR										{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| TK_IDENTIFIER index							{ $$ = 0; /* temporario */}
+	| TK_IDENTIFIER '(' lista_argumentos ')'		{ $$ = 0; /* temporario */}
+	| expr '+' expr									{ $$ = astCreate(AST_ADD, 0, $1, $3, 0, 0); }
+	| expr '-' expr									{ $$ = astCreate(AST_SUB, 0, $1, $3, 0, 0); }
+	| expr '/' expr									{ $$ = astCreate(AST_DIV, 0, $1, $3, 0, 0); }
+	| expr '.' expr									{ $$ = astCreate(AST_MUL, 0, $1, $3, 0, 0); }
+	| expr '<' expr									{ $$ = astCreate(AST_LT, 0, $1, $3, 0, 0); }
+	| expr '>' expr									{ $$ = astCreate(AST_GT, 0, $1, $3, 0, 0); }
+	| '(' expr ')'									{ $$ = 0; /* temporario */}
+	| expr OPERATOR_LE expr							{ $$ = astCreate(AST_LE, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_GE expr							{ $$ = astCreate(AST_GE, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_EQ expr							{ $$ = astCreate(AST_EQ, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_DIF expr						{ $$ = astCreate(AST_DIF, 0, $1, $3, 0, 0); }
+	| expr '&' expr									{ $$ = astCreate(AST_AND, 0, $1, $3, 0, 0); }
+	| expr '|' expr									{ $$ = astCreate(AST_OR, 0, $1, $3, 0, 0); }
+	| '~' expr										{ $$ = 0; /* temporario */}
 
 %%
 
