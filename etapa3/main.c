@@ -4,9 +4,8 @@ Tiago de Carvalho Magnus - 00287710
 Pedro Hoerlle de Oliveira - 00288548
 */
 
-#include <stdio.h>
-
 #include "hash.h"
+#include "ast.h"
 #include "lex.yy.h"
 #include "y.tab.h"
 
@@ -67,7 +66,7 @@ int main (int argc, char **argv)
     initMe ();
     yyparse ();
     printf ("Main done! File has %d lines\n", getLineNumber ());
-    hashPrint ();
+    //hashPrint ();
     printf ("Sucesso\n");
     exit (0);
 }
