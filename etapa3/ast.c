@@ -6,10 +6,12 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #include "ast.h"
 
+extern FILE *output;
+
 AST *astCreate (int type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3)
 {
     AST* newnode;
-    newnode = (AST*) calloc(1, sizeof(AST));
+    newnode = (AST*) calloc (1, sizeof(AST));
     newnode->type = type;
     newnode->symbol = symbol;
     newnode->son[0] = son0;
@@ -30,7 +32,7 @@ void astPrint (AST *node, int level)
     {
         fprintf (stderr, "  ");
     }
-    fprintf (stderr, "ast(");
+    fprintf (stderr, "AST(");
     switch (node->type)
     {
         case AST_SYMBOL: fprintf (stderr, "AST_SYMBOL"); break;
@@ -63,3 +65,17 @@ void astPrint (AST *node, int level)
     }
 }
 
+void astDecompile (AST *node)
+{
+    if (node == 0)
+    {
+        return;
+    }
+    switch (node->type)
+    {
+        case AST_SYMBOL:
+            fprintf (output, "%s", node->symbol->text);
+            break;
+        default: break;
+    }
+}
