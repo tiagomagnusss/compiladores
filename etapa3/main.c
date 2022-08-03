@@ -9,6 +9,8 @@ Pedro Hoerlle de Oliveira - 00288548
 #include "lex.yy.h"
 #include "y.tab.h"
 
+FILE *output;
+
 int getLineNumber (void);
 
 void initMe (void)
@@ -19,15 +21,20 @@ void initMe (void)
 int main (int argc, char **argv)
 {
 //  int tok;
-    if (argc < 2)
+    if (argc < 3)
         {
-            fprintf (stderr,"Call: ./etapa1 input.txt\n");
+            fprintf (stderr,"Missing operand. Call: ./etapa3 input.txt output.txt\n");
             exit (1);
         }
-    if ((yyin = fopen (argv[1],"r")) == 0)
+    if ((yyin = fopen (argv[1], "r")) == 0)
         {
             printf ("Cannot open file %s... \n",argv[1]);
             exit (2);
+        }
+    if ((output = fopen (argv[2], "w")) == 0)
+        {
+            printf ("Cannot open file %s... \n",argv[2]);
+            exit (4);
         }
 
 /*
@@ -67,6 +74,7 @@ int main (int argc, char **argv)
     yyparse ();
     printf ("Main done! File has %d lines\n", getLineNumber ());
     //hashPrint ();
+    fclose (output);
     printf ("Sucesso\n");
     exit (0);
 }

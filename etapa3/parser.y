@@ -115,7 +115,7 @@ cmd_simples: cmd_atrib
 	| /* empty */
 	;
 
-cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr			{ astPrint ($3, 0); }
+cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr			{ astPrint ($3, 0); astDecompile ($3); }
 	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr
 	;
 
@@ -150,24 +150,24 @@ resto_print: lista_elementos
 	| /* empty */
 	;
 
-expr: LIT_INTEGER									{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
-	| LIT_FLOAT										{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
-	| LIT_CHAR										{ $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
+expr: LIT_INTEGER									{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_FLOAT										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_CHAR										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	| TK_IDENTIFIER index							{ $$ = 0; /* temporario */}
 	| TK_IDENTIFIER '(' lista_argumentos ')'		{ $$ = 0; /* temporario */}
-	| expr '+' expr									{ $$ = astCreate(AST_ADD, 0, $1, $3, 0, 0); }
-	| expr '-' expr									{ $$ = astCreate(AST_SUB, 0, $1, $3, 0, 0); }
-	| expr '/' expr									{ $$ = astCreate(AST_DIV, 0, $1, $3, 0, 0); }
-	| expr '.' expr									{ $$ = astCreate(AST_MUL, 0, $1, $3, 0, 0); }
-	| expr '<' expr									{ $$ = astCreate(AST_LT, 0, $1, $3, 0, 0); }
-	| expr '>' expr									{ $$ = astCreate(AST_GT, 0, $1, $3, 0, 0); }
+	| expr '+' expr									{ $$ = astCreate (AST_ADD, 0, $1, $3, 0, 0); }
+	| expr '-' expr									{ $$ = astCreate (AST_SUB, 0, $1, $3, 0, 0); }
+	| expr '/' expr									{ $$ = astCreate (AST_DIV, 0, $1, $3, 0, 0); }
+	| expr '.' expr									{ $$ = astCreate (AST_MUL, 0, $1, $3, 0, 0); }
+	| expr '<' expr									{ $$ = astCreate (AST_LT, 0, $1, $3, 0, 0); }
+	| expr '>' expr									{ $$ = astCreate (AST_GT, 0, $1, $3, 0, 0); }
 	| '(' expr ')'									{ $$ = 0; /* temporario */}
-	| expr OPERATOR_LE expr							{ $$ = astCreate(AST_LE, 0, $1, $3, 0, 0); }
-	| expr OPERATOR_GE expr							{ $$ = astCreate(AST_GE, 0, $1, $3, 0, 0); }
-	| expr OPERATOR_EQ expr							{ $$ = astCreate(AST_EQ, 0, $1, $3, 0, 0); }
-	| expr OPERATOR_DIF expr						{ $$ = astCreate(AST_DIF, 0, $1, $3, 0, 0); }
-	| expr '&' expr									{ $$ = astCreate(AST_AND, 0, $1, $3, 0, 0); }
-	| expr '|' expr									{ $$ = astCreate(AST_OR, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_LE expr							{ $$ = astCreate (AST_LE, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_GE expr							{ $$ = astCreate (AST_GE, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_EQ expr							{ $$ = astCreate (AST_EQ, 0, $1, $3, 0, 0); }
+	| expr OPERATOR_DIF expr						{ $$ = astCreate (AST_DIF, 0, $1, $3, 0, 0); }
+	| expr '&' expr									{ $$ = astCreate (AST_AND, 0, $1, $3, 0, 0); }
+	| expr '|' expr									{ $$ = astCreate (AST_OR, 0, $1, $3, 0, 0); }
 	| '~' expr										{ $$ = 0; /* temporario */}
 
 %%
