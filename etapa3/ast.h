@@ -24,8 +24,31 @@ Pedro Hoerlle de Oliveira - 00288548
 #define AST_DIF 11
 #define AST_AND 12
 #define AST_OR 13
-//#define AST 
+#define AST_VECTOR 14
+#define AST_FUNC_CALL 15
+#define AST_ASSOCITIVITY 16
+#define AST_NOT 17
+#define AST_LIST_ARGUMENTS 18
+#define AST_LIST_ELEMENTS_STRING 19
+#define AST_LIST_ELEMENTS_EXPR 20
+#define AST_RETURN 21
+#define AST_READ 22
+#define AST_PRINT 23
+#define AST_WHILE 24
+#define AST_ELSE 25
+#define AST_IF 26
+#define AST_ATRIB_VARIAVEL 27
+#define AST_ATRIB_VETOR 28
+#define AST_BLOCK 29
+#define AST_RESTO 30
+#define AST_CHAR 31
+#define AST_INT 32
+#define AST_FLOAT 33
+#define AST_RESTO_PARAMS 34
+#define AST_PARAM 35
+#define AST_LISTA_PARAMS 36
 
+//#define AST
 
 typedef struct astnode
 {

@@ -48,6 +48,11 @@ void astPrint (AST *node, int level)
         case AST_DIF: fprintf (stderr, "AST_DIF"); break;
         case AST_AND: fprintf (stderr, "AST_AND"); break;
         case AST_OR: fprintf (stderr, "AST_OR"); break;
+        case AST_VECTOR: fprintf (stderr, "AST_VECTOR"); break;
+        case AST_FUNC_CALL: fprintf (stderr, "AST_FUNC_CALL"); break;
+        case AST_ASSOCITIVITY: fprintf (stderr, "AST_ASSOCITIVITY"); break;
+        case AST_NOT: fprintf (stderr, "AST_NOT"); break;
+        case AST_LIST_ARGUMENTS: fprintf (stderr, "AST_LIST_ARGUMENTS"); break;
         //case AST: fprintf (stderr, "AST"); break;
         default: fprintf (stderr, "AST_UNKNOWN"); break;
     }

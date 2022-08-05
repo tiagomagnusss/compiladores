@@ -48,6 +48,24 @@ void yyerror (char const *);
 %token TOKEN_ERROR
 
 %type<ast> expr
+%type<ast> resto_print
+%type<ast> index
+%type<ast> lista_argumentos
+%type<ast> lista_elementos
+%type<ast> cmd_return
+%type<ast> cmd_read
+%type<ast> cmd_print
+%type<ast> cmd_while
+%type<ast> cmd_else
+%type<ast> cmd_if
+%type<ast> cmd_atrib
+%type<ast> cmd_simples
+%type<ast> tipo
+%type<ast> resto_params
+%type<ast> param
+%type<ast> lista_params
+%type<ast> resto
+%type<ast> bloco
 
 %left '|' '&' '~'
 %left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
@@ -56,119 +74,119 @@ void yyerror (char const *);
 
 %%
 
-programa: lista_dec
+programa: lista_dec									//{ astPrint ($1, 0); astDecompile ($1); }
 	;
 
 lista_dec: dec lista_dec
-	| /* empty */
+	| /* empty */									//{ $$ = 0; }
 	;
 
-dec: tipo TK_IDENTIFIER '(' valor ')' 										';'
-	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao					';'
+dec: tipo TK_IDENTIFIER '(' valor ')'';'
+	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao';'
 	| tipo TK_IDENTIFIER '(' lista_params ')' bloco
 	;
 
 inicializacao: valor inicializacao
-	| /* empty */
+	| /* empty */									
 	;
 
 valor: LIT_INTEGER
 	| LIT_FLOAT
 	| LIT_CHAR
-	| TK_IDENTIFIER
+//	| TK_IDENTIFIER "acho q ta errado isso"
 	;
 
-lista_argumentos: expr lista_argumentos
-	| /* empty */
+lista_argumentos: expr lista_argumentos				{ $$ = astCreate (AST_LIST_ARGUMENTS, 0, $1, $2, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-bloco: '{' cmd_simples resto '}'
+bloco: '{' cmd_simples resto '}'					{ $$ = astCreate (AST_BLOCK, 0, $2, $3, 0, 0); }
 	;
 
-resto: ';' cmd_simples resto
-	| /* empty */
+resto: ';' cmd_simples resto						{ $$ = astCreate (AST_RESTO, 0, $2, $3, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-lista_params: param resto_params
-	| /* empty */
+lista_params: param resto_params					{ $$ = astCreate (AST_LISTA_PARAMS, 0, $1, $2, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-param: tipo TK_IDENTIFIER
+param: tipo TK_IDENTIFIER							{ $$ = astCreate (AST_PARAM, $2, $1, 0, 0, 0); }
 	;
 
-resto_params: param resto_params
-	| /* empty */
+resto_params: param resto_params					{ $$ = astCreate (AST_RESTO_PARAMS, 0, $1, $2, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-tipo: KW_CHAR
-	| KW_INT
-	| KW_FLOAT
+tipo: KW_CHAR										{ $$ = astCreate (AST_CHAR, 0, 0, 0, 0, 0); }
+	| KW_INT										{ $$ = astCreate (AST_INT, 0, 0, 0, 0, 0); }
+	| KW_FLOAT										{ $$ = astCreate (AST_FLOAT, 0, 0, 0, 0, 0); }
 	;
 
-cmd_simples: cmd_atrib
-	| cmd_if
-	| cmd_while
-	| cmd_print
-	| cmd_read
-	| cmd_return
-	| bloco
-	| /* empty */
+cmd_simples: cmd_atrib								{ $$ = $1; }
+	| cmd_if										{ $$ = $1; }
+	| cmd_while										{ $$ = $1; }
+	| cmd_print										{ $$ = $1; }
+	| cmd_read										{ $$ = $1; }
+	| cmd_return									{ $$ = $1; }
+	| bloco											{ $$ = $1; }
+	| /* empty */									{ $$ = 0; }
 	;
 
-cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr			{ astPrint ($3, 0); astDecompile ($3); }
-	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr
+cmd_atrib: TK_IDENTIFIER ASSIGNMENT expr			{ $$ = astCreate (AST_ATRIB_VARIAVEL, $1, $3, 0, 0, 0); }
+	| TK_IDENTIFIER '[' expr ']' ASSIGNMENT expr	{ $$ = astCreate (AST_ATRIB_VETOR, $1, $3, $6, 0, 0); }
 	;
 
-cmd_if: KW_IF '(' expr ')' cmd_simples cmd_else
+cmd_if: KW_IF '(' expr ')' cmd_simples cmd_else		{ $$ = astCreate (AST_IF, 0, $3, $5, $6, 0); }
 	;
 
-cmd_else: KW_ELSE cmd_simples
-	| /* empty */
+cmd_else: KW_ELSE cmd_simples						{ $$ = astCreate (AST_ELSE, 0, $2, 0, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-cmd_while: KW_WHILE '(' expr ')' cmd_simples
+cmd_while: KW_WHILE '(' expr ')' cmd_simples		{ $$ = astCreate (AST_WHILE, 0, $3, $5, 0, 0); }
 	;
 
-cmd_print: KW_PRINT lista_elementos
+cmd_print: KW_PRINT lista_elementos					{ $$ = astCreate (AST_PRINT, 0, $2, 0, 0, 0); }
 	;
 
-cmd_read: KW_READ TK_IDENTIFIER index
+cmd_read: KW_READ TK_IDENTIFIER index				{ $$ = astCreate (AST_READ, $2, $3, 0, 0, 0); }
 	;
 
-index: '[' expr ']'
-	| /* empty */
+index: '[' expr ']'									{ $$ = $2; }
+	| /* empty */									{ $$ = 0; }
 	;
 
-cmd_return: KW_RETURN expr
+cmd_return: KW_RETURN expr							{ $$ = astCreate (AST_RETURN, 0, $2, 0, 0, 0); }
 	;
 
-lista_elementos: LIT_STRING resto_print
-	| expr resto_print
+lista_elementos: LIT_STRING resto_print				{ $$ = astCreate (AST_LIST_ELEMENTS_STRING, $1, $2, 0, 0, 0); }
+	| expr resto_print								{ $$ = astCreate (AST_LIST_ELEMENTS_EXPR, 0, $1, $2, 0, 0); }
 	;
 
-resto_print: lista_elementos
-	| /* empty */
+resto_print: lista_elementos						{ $$ = $1; }
+	| /* empty */									{ $$ = 0; }
 	;
 
 expr: LIT_INTEGER									{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	| LIT_FLOAT										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	| LIT_CHAR										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
-	| TK_IDENTIFIER index							{ $$ = 0; /* temporario */}
-	| TK_IDENTIFIER '(' lista_argumentos ')'		{ $$ = 0; /* temporario */}
+	| TK_IDENTIFIER index							{ $$ = astCreate (AST_VECTOR, $1, $2, 0, 0, 0); }
+	| TK_IDENTIFIER '(' lista_argumentos ')'		{ $$ = astCreate (AST_FUNC_CALL, $1, $3, 0, 0, 0); }
 	| expr '+' expr									{ $$ = astCreate (AST_ADD, 0, $1, $3, 0, 0); }
 	| expr '-' expr									{ $$ = astCreate (AST_SUB, 0, $1, $3, 0, 0); }
 	| expr '/' expr									{ $$ = astCreate (AST_DIV, 0, $1, $3, 0, 0); }
 	| expr '.' expr									{ $$ = astCreate (AST_MUL, 0, $1, $3, 0, 0); }
 	| expr '<' expr									{ $$ = astCreate (AST_LT, 0, $1, $3, 0, 0); }
 	| expr '>' expr									{ $$ = astCreate (AST_GT, 0, $1, $3, 0, 0); }
-	| '(' expr ')'									{ $$ = 0; /* temporario */}
+	| '(' expr ')'									{ $$ = astCreate (AST_ASSOCITIVITY, 0, $2, 0, 0, 0); }
 	| expr OPERATOR_LE expr							{ $$ = astCreate (AST_LE, 0, $1, $3, 0, 0); }
 	| expr OPERATOR_GE expr							{ $$ = astCreate (AST_GE, 0, $1, $3, 0, 0); }
 	| expr OPERATOR_EQ expr							{ $$ = astCreate (AST_EQ, 0, $1, $3, 0, 0); }
 	| expr OPERATOR_DIF expr						{ $$ = astCreate (AST_DIF, 0, $1, $3, 0, 0); }
 	| expr '&' expr									{ $$ = astCreate (AST_AND, 0, $1, $3, 0, 0); }
 	| expr '|' expr									{ $$ = astCreate (AST_OR, 0, $1, $3, 0, 0); }
-	| '~' expr										{ $$ = 0; /* temporario */}
+	| '~' expr										{ $$ = astCreate (AST_NOT, 0, $2, 0, 0, 0); }
 
 %%
 
