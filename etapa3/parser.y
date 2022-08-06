@@ -66,6 +66,11 @@ void yyerror (char const *);
 %type<ast> lista_params
 %type<ast> resto
 %type<ast> bloco
+%type<ast> valor
+%type<ast> inicializacao
+%type<ast> dec
+%type<ast> lista_dec
+%type<ast> programa
 
 %left '|' '&' '~'
 %left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
@@ -74,26 +79,25 @@ void yyerror (char const *);
 
 %%
 
-programa: lista_dec									//{ astPrint ($1, 0); astDecompile ($1); }
+programa: lista_dec									{ $$ = astCreate (AST_PROGRAM, 0, $1, 0, 0, 0); astPrint ($$, 0); astDecompile ($$); }
 	;
 
-lista_dec: dec lista_dec
-	| /* empty */									//{ $$ = 0; }
+lista_dec: dec lista_dec							{ $$ = astCreate (AST_LIST_DEC, 0, $1, $2, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-dec: tipo TK_IDENTIFIER '(' valor ')'';'
-	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao';'
-	| tipo TK_IDENTIFIER '(' lista_params ')' bloco
+dec: tipo TK_IDENTIFIER '(' valor ')'';'			{ $$ = astCreate (AST_DEC_VARIABLE, $2, $1, $4, 0, 0); }
+	| tipo TK_IDENTIFIER '[' LIT_INTEGER ']' inicializacao';'	{ $$ = astCreate (AST_DEC_VECTOR, $2, $1, astCreate (AST_DEC_VECTOR_SIZE, $4, 0, 0, 0, 0), $6, 0); }
+	| tipo TK_IDENTIFIER '(' lista_params ')' bloco	{ $$ = astCreate (AST_DEC_FUNC, $2, $1, $4, $6, 0); }
 	;
 
-inicializacao: valor inicializacao
-	| /* empty */									
+inicializacao: valor inicializacao					{ $$ = astCreate (AST_INIT, 0, $1, $2, 0, 0); }
+	| /* empty */									{ $$ = 0; }
 	;
 
-valor: LIT_INTEGER
-	| LIT_FLOAT
-	| LIT_CHAR
-//	| TK_IDENTIFIER "acho q ta errado isso"
+valor: LIT_INTEGER									{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_FLOAT										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
+	| LIT_CHAR										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	;
 
 lista_argumentos: expr lista_argumentos				{ $$ = astCreate (AST_LIST_ARGUMENTS, 0, $1, $2, 0, 0); }
@@ -153,7 +157,7 @@ cmd_print: KW_PRINT lista_elementos					{ $$ = astCreate (AST_PRINT, 0, $2, 0, 0
 cmd_read: KW_READ TK_IDENTIFIER index				{ $$ = astCreate (AST_READ, $2, $3, 0, 0, 0); }
 	;
 
-index: '[' expr ']'									{ $$ = $2; }
+index: '[' expr ']'									{ $$ = astCreate (AST_ACCESS_VECTOR, 0, $2, 0, 0, 0); }
 	| /* empty */									{ $$ = 0; }
 	;
 
@@ -171,7 +175,7 @@ resto_print: lista_elementos						{ $$ = $1; }
 expr: LIT_INTEGER									{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	| LIT_FLOAT										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
 	| LIT_CHAR										{ $$ = astCreate (AST_SYMBOL, $1, 0, 0, 0, 0); }
-	| TK_IDENTIFIER index							{ $$ = astCreate (AST_VECTOR, $1, $2, 0, 0, 0); }
+	| TK_IDENTIFIER index							{ $$ = astCreate (AST_VARIABLE, $1, $2, 0, 0, 0); }
 	| TK_IDENTIFIER '(' lista_argumentos ')'		{ $$ = astCreate (AST_FUNC_CALL, $1, $3, 0, 0, 0); }
 	| expr '+' expr									{ $$ = astCreate (AST_ADD, 0, $1, $3, 0, 0); }
 	| expr '-' expr									{ $$ = astCreate (AST_SUB, 0, $1, $3, 0, 0); }

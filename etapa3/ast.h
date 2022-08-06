@@ -24,7 +24,7 @@ Pedro Hoerlle de Oliveira - 00288548
 #define AST_DIF 11
 #define AST_AND 12
 #define AST_OR 13
-#define AST_VECTOR 14
+#define AST_VARIABLE 14
 #define AST_FUNC_CALL 15
 #define AST_ASSOCITIVITY 16
 #define AST_NOT 17
@@ -47,8 +47,14 @@ Pedro Hoerlle de Oliveira - 00288548
 #define AST_RESTO_PARAMS 34
 #define AST_PARAM 35
 #define AST_LISTA_PARAMS 36
-
-//#define AST
+#define AST_INIT 37
+#define AST_DEC_FUNC 38
+#define AST_DEC_VECTOR 39
+#define AST_DEC_VECTOR_SIZE 40
+#define AST_DEC_VARIABLE 41
+#define AST_LIST_DEC 42
+#define AST_ACCESS_VECTOR 43
+#define AST_PROGRAM 44
 
 typedef struct astnode
 {
