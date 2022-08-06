@@ -103,8 +103,229 @@ void astDecompile (AST *node)
     }
     switch (node->type)
     {
+        case AST_PROGRAM:
+            astDecompile (node->son[0]);
+            break;
+        case AST_LIST_DEC:
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_DEC_VARIABLE:
+            astDecompile (node->son[0]);
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, " (");
+            astDecompile (node->son[1]);
+            fprintf (output, ");");
+            fprintf (output, "\n");
+            break;
+        case AST_DEC_VECTOR:
+            astDecompile (node->son[0]);
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, "[");
+            astDecompile (node->son[1]);
+            fprintf (output, "]");
+            astDecompile (node->son[2]);
+            fprintf (output, ";");
+            fprintf (output, "\n");
+            break;
+        case AST_DEC_VECTOR_SIZE:
+            fprintf (output, "%s", node->symbol->text);
+            break;
+        case AST_DEC_FUNC:
+            astDecompile (node->son[0]);
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, " (");
+            astDecompile (node->son[1]);
+            fprintf (output, ")");
+            astDecompile (node->son[2]);
+            fprintf (output, "\n");
+            break;
+        case AST_INIT:
+            fprintf (output, " ");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
         case AST_SYMBOL:
             fprintf (output, "%s", node->symbol->text);
+            break;
+        case AST_LIST_ARGUMENTS:
+            fprintf (output, " ");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_BLOCK:
+            fprintf (output, "\n");
+            fprintf (output, "{");
+            fprintf (output, "\n");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            fprintf (output, "\n");
+            fprintf (output, "}");
+            fprintf (output, "\n");
+            break;
+        case AST_RESTO:
+            fprintf (output, ";");
+            fprintf (output, "\n");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_LISTA_PARAMS:
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_PARAM:
+            astDecompile (node->son[0]);
+            fprintf (output, "%s", node->symbol->text);
+            break;
+        case AST_RESTO_PARAMS:
+            fprintf (output, " ");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_CHAR:
+            fprintf (output, "char ");
+            break;
+        case AST_INT:
+            fprintf (output, "int ");
+            break;
+        case AST_FLOAT:
+            fprintf (output, "float ");
+            break;
+        case AST_ATRIB_VARIAVEL:
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, " <- ");
+            astDecompile (node->son[0]);
+            break;
+        case AST_ATRIB_VETOR:
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, "[");
+            astDecompile (node->son[0]);
+            fprintf (output, "] <- ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_IF:
+            fprintf (output, "if (");
+            astDecompile (node->son[0]);
+            fprintf (output, ")");
+            astDecompile (node->son[1]);
+            astDecompile (node->son[2]);
+            break;
+        case AST_ELSE:
+            fprintf (output, " else ");
+            astDecompile (node->son[0]);
+            break;
+        case AST_WHILE:
+            fprintf (output, "while (");
+            astDecompile (node->son[0]);
+            fprintf (output, ")");
+            astDecompile (node->son[1]);
+            break;
+        case AST_PRINT:
+            fprintf (output, "print");
+            astDecompile (node->son[0]);
+            break;
+        case AST_READ:
+            fprintf (output, "read ");
+            fprintf (output, "%s", node->symbol->text);
+            astDecompile (node->son[0]);
+            break;
+        case AST_ACCESS_VECTOR:
+            fprintf (output, "[");
+            astDecompile (node->son[0]);
+            fprintf (output, "]");
+            break;
+        case AST_RETURN:
+            fprintf (output, "return ");
+            astDecompile (node->son[0]);
+            break;
+        case AST_LIST_ELEMENTS_STRING:
+            fprintf (output, " ");
+            fprintf (output, "%s", node->symbol->text);
+            astDecompile (node->son[0]);
+            break;
+        case AST_LIST_ELEMENTS_EXPR:
+            fprintf (output, " ");
+            astDecompile (node->son[0]);
+            astDecompile (node->son[1]);
+            break;
+        case AST_VARIABLE:
+            fprintf (output, "%s", node->symbol->text);
+            astDecompile (node->son[0]);
+            break;
+        case AST_FUNC_CALL:
+            fprintf (output, "%s", node->symbol->text);
+            fprintf (output, " (");
+            astDecompile (node->son[0]);
+            fprintf (output, ")");
+            break;
+        case AST_ADD:
+            astDecompile (node->son[0]);
+            fprintf (output, " + ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_SUB:
+            astDecompile (node->son[0]);
+            fprintf (output, " - ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_DIV:
+            astDecompile (node->son[0]);
+            fprintf (output, " / ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_MUL:
+            astDecompile (node->son[0]);
+            fprintf (output, " . ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_LT:
+            astDecompile (node->son[0]);
+            fprintf (output, " < ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_GT:
+            astDecompile (node->son[0]);
+            fprintf (output, " > ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_ASSOCITIVITY:
+            fprintf (output, "(");
+            astDecompile (node->son[0]);
+            fprintf (output, ")");
+            break;
+        case AST_LE:
+            astDecompile (node->son[0]);
+            fprintf (output, " <= ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_GE:
+            astDecompile (node->son[0]);
+            fprintf (output, " >= ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_EQ:
+            astDecompile (node->son[0]);
+            fprintf (output, " == ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_DIF:
+            astDecompile (node->son[0]);
+            fprintf (output, " != ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_AND:
+            astDecompile (node->son[0]);
+            fprintf (output, " & ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_OR:
+            astDecompile (node->son[0]);
+            fprintf (output, " | ");
+            astDecompile (node->son[1]);
+            break;
+        case AST_NOT:
+            fprintf (output, "~");
+            astDecompile (node->son[0]);
             break;
         default: break;
     }

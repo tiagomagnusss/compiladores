@@ -41,6 +41,11 @@ int main ()
     a <- a + 1;
     print "A era=15\n";
     };
+
+  if (a == 20)
+  a <- a + 2
+  else
+  a <- a + 3;
     
   if (i==100)
     {
