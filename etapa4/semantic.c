@@ -11,15 +11,25 @@ void setDeclarations(AST* node) {
 
 	if (node->type == AST_DECVARIABLE){
 		if (node->symbol){
-			if (node->type == SYMBOL_IDENTIFIER)
-				node->type = SYMBOL_VARIABLE;
-			else {
+			if (node->symbol->type == SYMBOL_IDENTIFIER){
+				if (node->son[0]->type == AST_TYPEINT)
+					node->symbol->datatype = DATATYPE_INT;
+				else (node->son[0]->type == AST_TYPEFLOAT)
+					node->symbol->datatype = DATATYPE_INT;
+					
+				node->symbol->type = SYMBOL_VARIABLE;
+			} else {
 				fprintf(stderr, "Semantic error: symbol %s  redeclared.\n", node->text);
 				++semanticErrors;
 			}
 		else
 			//message semnsimbolo
 	}
+
+	if (node->type == AST_DECFUNCTION){
+		//same as vars
+	}
+	
 	
 	for (i = 0; i < MAX_SONS; ++i)
 	{

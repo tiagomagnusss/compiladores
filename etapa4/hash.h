@@ -18,9 +18,14 @@ Pedro Hoerlle de Oliveira - 00288548
 #define SYMBOL_VARIABLE 3
 #define SYMBOL_FUNCTION 4
 
+#define DATATYPE_INT 1
+#define DATATYPE_FLOAT 2
+#define DATATYPE_BOOL 3 //opt
+
 typedef struct hash_node
 {
     int type;
+    int datatype;
     char *text;
     struct hash_node * next;
 } HASH_NODE;
