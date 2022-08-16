@@ -52,3 +52,26 @@ void checkUndeclared(){
 int getSemanticErrors(){
 	return semanticErrors;
 }
+
+void checkOperands(AST* node){
+	if (!node) return;
+
+	for(i=0; i<MAXSONS; ++i){
+		setDeclarations(node->son[i]);
+	}
+
+	switch(node->type){
+		case AST_ADD:
+		case AST_SUB:
+		// TODO complete
+			if (){
+				//ok
+				// evaluate children
+				// check types
+			} else {
+				fprintf(stderr, "Sem error operands don't match.\n");
+				++semanticErrors;
+			}
+		break;
+	}
+}

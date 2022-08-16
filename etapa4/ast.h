@@ -59,6 +59,7 @@ Pedro Hoerlle de Oliveira - 00288548
 typedef struct astnode
 {
     int type;
+    int datatype;
     HASH_NODE *symbol;
     struct astnode *son[MAX_SONS];
 } AST;
