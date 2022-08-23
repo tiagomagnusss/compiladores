@@ -6,35 +6,43 @@ int semanticErrors = 0;
 
 void setDeclarations(AST* node) {
 	int i;
-	
+
 	if (!node) return;
+	if (!node->symbol) return;
 
-	if (node->type == AST_DECVARIABLE){
-		if (node->symbol){
-			if (node->symbol->type == SYMBOL_IDENTIFIER){
-				if (node->son[0]->type == AST_TYPEINT)
-					node->symbol->datatype = DATATYPE_INT;
-				else (node->son[0]->type == AST_TYPEFLOAT)
-					node->symbol->datatype = DATATYPE_INT;
-					
-				node->symbol->type = SYMBOL_VARIABLE;
-			} else {
-				fprintf(stderr, "Semantic error: symbol %s  redeclared.\n", node->text);
-				++semanticErrors;
-			}
-		else
-			//message semnsimbolo
+	if (node->type == AST_DEC_VARIABLE){
+		if (node->symbol->type == SYMBOL_IDENTIFIER){
+			if (node->son[0]->type == AST_INT)
+				node->symbol->datatype = DATATYPE_INT;
+			else if (node->son[0]->type == AST_FLOAT)
+				node->symbol->datatype = DATATYPE_FLOAT;
+			else if (node->son[0]->type == AST_CHAR)
+				node->symbol->datatype = DATATYPE_CHAR;
+		} else {
+			fprintf(stderr, "Semantic error: symbol %s redeclared.\n", node->symbol->text);
+			++semanticErrors;
+		}
 	}
 
-	if (node->type == AST_DECFUNCTION){
-		//same as vars
+	if (node->type == AST_DEC_FUNC){
+		if (node->symbol->type == SYMBOL_IDENTIFIER){
+			if (node->son[0]->type == AST_INT)
+				node->symbol->datatype = DATATYPE_INT;
+			else if (node->son[0]->type == AST_FLOAT)
+				node->symbol->datatype = DATATYPE_FLOAT;
+			else if (node->son[0]->type == AST_CHAR)
+				node->symbol->datatype = DATATYPE_CHAR;
+		} else {
+			fprintf(stderr, "Semantic error: symbol %s redeclared.\n", node->symbol->text);
+			++semanticErrors;
+		}
 	}
-	
-	
+
+
 	for (i = 0; i < MAX_SONS; ++i)
 	{
 		setDeclarations(node->son[i]);
-	}	
+	}
 }
 
 void checkUndeclared(){

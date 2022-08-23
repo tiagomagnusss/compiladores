@@ -6,4 +6,4 @@
 void setDeclarations(AST* node);
 void checkUndeclared();
 int getSemanticErrors();
-void checkOperands();
+void checkOperands(AST* node);
