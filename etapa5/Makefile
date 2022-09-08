@@ -45,7 +45,7 @@
 # But now the hash table is compiled in a separate gcc call
 # Therefore, there must be a header of it to be included in scanner.l
 
-etapa4: y.tab.o lex.yy.o hash.o ast.o tac.o main.o semantic.o
+etapa5: y.tab.o lex.yy.o hash.o ast.o tac.o main.o semantic.o
 	gcc -Wall main.o lex.yy.o y.tab.o hash.o ast.o tac.o semantic.o -o etapa5
 
 main.o: main.c

@@ -81,7 +81,13 @@ void yyerror (char const *);
 
 %%
 
-programa: lista_dec									{ $$ = astCreate(AST_PROGRAM, 0, $1, 0, 0, 0); astPrint($$, 0); astDecompile($$); setDeclarations($1); checkUndeclared(); if (getSemanticErrors() > 0){ exit(4); }; tacPrintBack(generateCode($1)); }
+programa: lista_dec									{ $$ = astCreate(AST_PROGRAM, 0, $1, 0, 0, 0);
+																			astPrint($$, 0);
+																			astDecompile($$);
+																			setDeclarations($1);
+																			checkUndeclared();
+																			if (getSemanticErrors() > 0){ exit(4); };
+																			tacPrintBack(generateCode($1)); }
 	;
 
 lista_dec: dec lista_dec							{ $$ = astCreate (AST_LIST_DEC, 0, $1, $2, 0, 0); }

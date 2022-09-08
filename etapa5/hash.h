@@ -37,4 +37,6 @@ HASH_NODE *hashInsert (char *text, int type);
 void hashPrint (void);
 HASH_NODE* makeTemp();
 
+HASH_NODE *Table[HASH_SIZE];
+
 #endif

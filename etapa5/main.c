@@ -23,7 +23,7 @@ int main (int argc, char **argv)
 //  int tok;
     if (argc < 3)
         {
-            fprintf (stderr,"Missing operand. Call: ./etapa3 input.txt output.txt\n");
+            fprintf (stderr,"Missing operand. Call: ./etapa5 input.txt output.txt\n");
             exit (1);
         }
     if ((yyin = fopen (argv[1], "r")) == 0)
@@ -65,7 +65,7 @@ int main (int argc, char **argv)
             case LIT_FLOAT: printf ("LIT_FLOAT na linha %d\n", getLineNumber ()); break;
             case LIT_STRING: printf ("LIT_STRING na linha %d\n", getLineNumber ()); break;
             case TOKEN_ERROR: printf ("TOKEN_ERROR na linha %d\n", getLineNumber ()); break;
-            default: printf ("%c na linha %d\n", tok, getLineNumber ()); break; 
+            default: printf ("%c na linha %d\n", tok, getLineNumber ()); break;
         }
     }
 */

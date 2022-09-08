@@ -16,8 +16,6 @@ void setDeclarations(AST* node) {
 				node->symbol->datatype = DATATYPE_INT;
 			else if (node->son[0]->type == AST_FLOAT)
 				node->symbol->datatype = DATATYPE_FLOAT;
-			else if (node->son[0]->type == AST_CHAR)
-				node->symbol->datatype = DATATYPE_CHAR;
 		} else {
 			fprintf(stderr, "Semantic error: symbol %s redeclared.\n", node->symbol->text);
 			++semanticErrors;
@@ -30,8 +28,6 @@ void setDeclarations(AST* node) {
 				node->symbol->datatype = DATATYPE_INT;
 			else if (node->son[0]->type == AST_FLOAT)
 				node->symbol->datatype = DATATYPE_FLOAT;
-			else if (node->son[0]->type == AST_CHAR)
-				node->symbol->datatype = DATATYPE_CHAR;
 		} else {
 			fprintf(stderr, "Semantic error: symbol %s redeclared.\n", node->symbol->text);
 			++semanticErrors;
@@ -50,7 +46,7 @@ void checkUndeclared(){
 	HASH_NODE* node;
 
 	for (i=0; i<HASH_SIZE; i++)
-		for (node=Table[i]; node; node = node->next)
+		for (node = Table[i]; node; node = node->next)
 			if (node->type == SYMBOL_IDENTIFIER){
 				fprintf(stderr, "Semantic error: symbol %s is undeclared.\n", node->text);
 				++semanticErrors;
@@ -64,7 +60,7 @@ int getSemanticErrors(){
 void checkOperands(AST* node){
 	if (!node) return;
 
-	for(i=0; i<MAXSONS; ++i){
+	for(int i=0; i<MAX_SONS; ++i){
 		setDeclarations(node->son[i]);
 	}
 
@@ -72,7 +68,7 @@ void checkOperands(AST* node){
 		case AST_ADD:
 		case AST_SUB:
 		// TODO complete
-			if (){
+			if (1==1){
 				//ok
 				// evaluate children
 				// check types
