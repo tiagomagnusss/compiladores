@@ -1,0 +1,20 @@
+int v[3] 'a' 0 0;
+int a (1);
+int b (9);
+int x (8);
+int y (7);
+int main ()
+{
+b <- 2;
+v[1] <- 33;
+b <- x . y + 5 + (8);
+if (a == 15)
+{
+a <- a + 1;
+
+}
+;
+if (a == 20)a <- a + 2 else a <- a + 3;
+
+}
+
