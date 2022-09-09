@@ -74,4 +74,4 @@ main.o: main.c
 	gcc -Wall -c main.c
 
 clean:
-	rm lex.yy.c lex.yy.h y.tab.c y.tab.h *.o etapa5
+	rm lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa5

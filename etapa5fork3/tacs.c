@@ -53,14 +53,21 @@ void tacPrint (TAC *tac)
 		case TAC_AND: fprintf (stderr, "TAC_AND"); break;
 		case TAC_OR: fprintf (stderr, "TAC_OR"); break;
 		case TAC_NOT: fprintf (stderr, "TAC_NOT"); break;
-		case TAC_COPY: fprintf (stderr, "TAC_COPY"); break;
-		case TAC_JFALSE: fprintf (stderr, "TAC_JFALSE"); break;
+		case TAC_MOVE: fprintf (stderr, "TAC_MOVE"); break;
+		case TAC_IFZ: fprintf (stderr, "TAC_IFZ"); break;
 		case TAC_LABEL: fprintf (stderr, "TAC_LABEL"); break;
 		case TAC_JUMP: fprintf (stderr, "TAC_JUMP"); break;
 		case TAC_VECTOR_INDEX: fprintf (stderr, "TAC_VECTOR_INDEX"); break;
 		case TAC_VARIABLE_VECTOR: fprintf (stderr, "TAC_VARIABLE_VECTOR"); break;
-		case TAC_COPY_VECTOR: fprintf (stderr, "TAC_COPY_VECTOR"); break;
+		case TAC_MOVE_VECTOR: fprintf (stderr, "TAC_MOVE_VECTOR"); break;
 		case TAC_ELSE: fprintf (stderr, "TAC_ELSE"); break;
+		case TAC_BEGINFUN: fprintf (stderr, "TAC_BEGINFUN"); break;
+		case TAC_ENDFUN: fprintf (stderr, "TAC_ENDFUN"); break;
+		case TAC_PARAM: fprintf (stderr, "TAC_PARAM"); break;
+		case TAC_ARG: fprintf (stderr, "TAC_ARG"); break;
+		case TAC_CALL: fprintf (stderr, "TAC_CALL"); break;
+		case TAC_CALLRES: fprintf (stderr, "TAC_CALLRES"); break;
+		case TAC_RETURN: fprintf (stderr, "TAC_RETURN"); break;
 		/*case TAC_XXX: fprintf (stderr, "TAC_XXX"); break;*/
 		default: fprintf (stderr, "TAC_UNKNOWN"); break;
 	}
@@ -110,21 +117,21 @@ TAC *binaryOp (TAC *code[], int type)
 
 TAC *makeIf (TAC *code[])
 {
-    TAC *jumpTac = 0, *jumpTacElse = 0;
-    TAC *labelTac = 0, *labelTacElse = 0;
-    HASH_NODE *newLabel = 0, *labelElse = 0;
+	TAC *jumpTac = 0, *jumpTacElse = 0;
+	TAC *labelTac = 0, *labelTacElse = 0;
+	HASH_NODE *newLabel = 0, *labelElse = 0;
 
-    newLabel = makeLabel();
-    jumpTac = tacJoin (code[0], tacCreate (TAC_JFALSE, newLabel, code[0] ? code[0]->res : 0, 0));
-    labelTac = tacCreate (TAC_LABEL, newLabel, 0, 0);
-    if (code[2])
-    {
-        labelElse = makeLabel();
-        labelTacElse = tacCreate (TAC_LABEL, labelElse, 0, 0);
-        jumpTacElse = tacCreate (TAC_JUMP, labelElse, 0, 0);
-        return tacJoin (tacJoin (tacJoin (tacJoin (tacJoin (jumpTac, code[1]), jumpTacElse), labelTac), code[2]), labelTacElse);
-    }
-    return tacJoin (tacJoin (jumpTac, code[1]), labelTac);
+	newLabel = makeLabel();
+	jumpTac = tacJoin (code[0], tacCreate (TAC_IFZ, newLabel, code[0] ? code[0]->res : 0, 0));
+	labelTac = tacCreate (TAC_LABEL, newLabel, 0, 0);
+	if (code[2])
+	{
+		labelElse = makeLabel();
+		labelTacElse = tacCreate (TAC_LABEL, labelElse, 0, 0);
+		jumpTacElse = tacCreate (TAC_JUMP, labelElse, 0, 0);
+		return tacJoin (tacJoin (tacJoin (tacJoin (tacJoin (jumpTac, code[1]), jumpTacElse), labelTac), code[2]), labelTacElse);
+	}
+	return tacJoin (tacJoin (jumpTac, code[1]), labelTac);
 }
 
 TAC *makeVariable(TAC *code[], AST *node)
@@ -137,6 +144,19 @@ TAC *makeVariable(TAC *code[], AST *node)
 	{
 		return tacCreate (TAC_SYMBOL, node->symbol, 0, 0);
 	}
+}
+
+TAC *makeFunction (TAC *code[], AST *node)
+{
+	TAC *symbol = tacCreate (TAC_SYMBOL, node->symbol, 0, 0);
+	return tacJoin (tacJoin (tacJoin (tacCreate (TAC_BEGINFUN, symbol->res, 0, 0), code[1]), code[2]), tacCreate (TAC_ENDFUN, symbol->res, 0, 0));
+}
+
+TAC *makeFunctionCall (TAC *code[], AST *node)
+{
+	HASH_NODE *newLabel = makeLabel();
+	return tacJoin (tacJoin (tacJoin (tacCreate (TAC_CALL, node->symbol, newLabel, 0), code[0]), 
+	tacJoin (tacCreate (TAC_JUMP, node->symbol, 0, 0), tacCreate (TAC_LABEL, newLabel, 0, 0))), tacCreate (TAC_CALLRES, makeTemp(), 0, 0));
 }
 
 TAC *generateCode (AST *node)
@@ -199,10 +219,10 @@ TAC *generateCode (AST *node)
 			result = binaryOp (code, TAC_NOT);
 			break;
 		case AST_ATRIB_VARIAVEL:
-			result = tacJoin (code[0], tacCreate (TAC_COPY, node->symbol, code[0] ? code[0]->res : 0, 0));
+			result = tacJoin (code[0], tacCreate (TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0));
 			break;
 		case AST_ATRIB_VETOR:
-			result = tacJoin (code[1], tacJoin (code[0], tacCreate (TAC_COPY_VECTOR, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0)));
+			result = tacJoin (code[1], tacJoin (code[0], tacCreate (TAC_MOVE_VECTOR, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0)));
 			break;
 		case AST_IF:
 			result = makeIf(code);
@@ -215,6 +235,21 @@ TAC *generateCode (AST *node)
 			break;
 		case AST_ACCESS_VECTOR:
 			result = tacJoin (code[0], tacCreate (TAC_VECTOR_INDEX, code[0] ? code[0]->res : 0, 0, 0));
+			break;
+		case AST_DEC_FUNC:
+			result = makeFunction (code, node);
+			break;
+		case AST_PARAM:
+			result = tacCreate (TAC_PARAM, node->symbol, 0, 0);
+			break;
+		case AST_LIST_ARGUMENTS:
+			result = tacJoin (tacJoin (code[0], tacCreate (TAC_ARG, code[0]->res, 0, 0)), code[1]);
+			break;
+		case AST_FUNC_CALL:
+			result = makeFunctionCall (code, node);
+			break;
+		case AST_RETURN:
+			result = tacJoin (code[0], tacCreate (TAC_RETURN, code[0] ? code[0]->res : 0, 0, 0));
 			break;
 		default:
 			result = tacJoin (code[0], tacJoin (code[1], tacJoin (code[2], code[3])));

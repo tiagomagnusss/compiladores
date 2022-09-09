@@ -23,7 +23,7 @@ int main (int argc, char **argv)
 //	int tok;
 	if (argc < 3)
 		{
-			fprintf (stderr,"Missing operand. Call: ./etapa3 input.txt output.txt\n");
+			fprintf (stderr,"Missing operand. Call: ./etapa5 input.txt output.txt\n");
 			exit (1);
 		}
 	if ((yyin = fopen (argv[1], "r")) == 0)
