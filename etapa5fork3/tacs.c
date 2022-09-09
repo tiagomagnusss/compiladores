@@ -30,10 +30,12 @@ void tacPrint (TAC *tac)
 	{
 		return;
 	}
-	//if (tac->type == TAC_SYMBOL)
-	//{
-	//	return;
-	//}
+	switch(tac->type)
+	{
+		case TAC_SYMBOL: return;
+		case TAC_VECTOR_INDEX: return;
+		case TAC_ELSE: return;
+	}
 	fprintf (stderr, "TAC(");
 	switch(tac->type)
 	{
@@ -51,11 +53,14 @@ void tacPrint (TAC *tac)
 		case TAC_AND: fprintf (stderr, "TAC_AND"); break;
 		case TAC_OR: fprintf (stderr, "TAC_OR"); break;
 		case TAC_NOT: fprintf (stderr, "TAC_NOT"); break;
-		case TAC_ATRIB_VARIAVEL: fprintf (stderr, "TAC_ATRIB_VARIAVEL"); break;
-		case TAC_ATRIB_VETOR: fprintf (stderr, "TAC_ATRIB_VETOR"); break;
-		case TAC_IFZ: fprintf (stderr, "TAC_IFZ"); break;
+		case TAC_COPY: fprintf (stderr, "TAC_COPY"); break;
+		case TAC_JFALSE: fprintf (stderr, "TAC_JFALSE"); break;
 		case TAC_LABEL: fprintf (stderr, "TAC_LABEL"); break;
 		case TAC_JUMP: fprintf (stderr, "TAC_JUMP"); break;
+		case TAC_VECTOR_INDEX: fprintf (stderr, "TAC_VECTOR_INDEX"); break;
+		case TAC_VARIABLE_VECTOR: fprintf (stderr, "TAC_VARIABLE_VECTOR"); break;
+		case TAC_COPY_VECTOR: fprintf (stderr, "TAC_COPY_VECTOR"); break;
+		case TAC_ELSE: fprintf (stderr, "TAC_ELSE"); break;
 		/*case TAC_XXX: fprintf (stderr, "TAC_XXX"); break;*/
 		default: fprintf (stderr, "TAC_UNKNOWN"); break;
 	}
@@ -103,35 +108,38 @@ TAC *binaryOp (TAC *code[], int type)
 	return tacJoin (tacJoin (code[0], code[1]), tacCreate (type, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
 }
 
-TAC *makeIf(TAC *code[])
+TAC *makeIf (TAC *code[])
 {
-	TAC *jumptac = 0;
-	TAC *labeltac = 0;
-	HASH_NODE *newlabel = 0;
-	newlabel = makeLabel();
-	jumptac = tacCreate (TAC_IFZ, newlabel, code[0] ? code[0]->res : 0, 0);
-	jumptac->prev = code[0];
-	labeltac = tacCreate (TAC_LABEL, newlabel, 0, 0);
-	labeltac->prev = code[1];
-	if(code[2])
+    TAC *jumpTac = 0, *jumpTacElse = 0;
+    TAC *labelTac = 0, *labelTacElse = 0;
+    HASH_NODE *newLabel = 0, *labelElse = 0;
+
+    newLabel = makeLabel();
+    jumpTac = tacJoin (code[0], tacCreate (TAC_JFALSE, newLabel, code[0] ? code[0]->res : 0, 0));
+    labelTac = tacCreate (TAC_LABEL, newLabel, 0, 0);
+    if (code[2])
+    {
+        labelElse = makeLabel();
+        labelTacElse = tacCreate (TAC_LABEL, labelElse, 0, 0);
+        jumpTacElse = tacCreate (TAC_JUMP, labelElse, 0, 0);
+        return tacJoin (tacJoin (tacJoin (tacJoin (tacJoin (jumpTac, code[1]), jumpTacElse), labelTac), code[2]), labelTacElse);
+    }
+    return tacJoin (tacJoin (jumpTac, code[1]), labelTac);
+}
+
+TAC *makeVariable(TAC *code[], AST *node)
+{
+	if (code[0])
 	{
-		TAC *jumptacelse = 0;
-		TAC *labeltacelse = 0;
-		HASH_NODE *newlabelelse = 0;
-		newlabelelse = makeLabel();
-		jumptacelse = tacCreate (TAC_JUMP, newlabelelse, 0, 0);
-		jumptacelse->prev = 0;
-		labeltacelse = tacCreate (TAC_LABEL, newlabelelse, 0, 0);
-		labeltacelse->prev = code[2];
-		return tacJoin (tacJoin (tacJoin (jumptac, labeltac), jumptacelse), labeltacelse);
+		return tacJoin (code[0], tacCreate (TAC_VARIABLE_VECTOR, makeTemp(), node->symbol, code[0] ? code[0]->res : 0));
 	}
 	else
 	{
-		return tacJoin (jumptac, labeltac);
+		return tacCreate (TAC_SYMBOL, node->symbol, 0, 0);
 	}
 }
 
-TAC *generateCode (AST* node)
+TAC *generateCode (AST *node)
 {
 	int i;
 	TAC *result = 0;
@@ -191,16 +199,22 @@ TAC *generateCode (AST* node)
 			result = binaryOp (code, TAC_NOT);
 			break;
 		case AST_ATRIB_VARIAVEL:
-			result = tacJoin (code[0], tacCreate (TAC_ATRIB_VARIAVEL, node->symbol, code[0] ? code[0]->res : 0, 0));
+			result = tacJoin (code[0], tacCreate (TAC_COPY, node->symbol, code[0] ? code[0]->res : 0, 0));
 			break;
 		case AST_ATRIB_VETOR:
-			result = tacJoin (tacJoin (code[0], code[1]), tacCreate (TAC_ATRIB_VETOR, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
+			result = tacJoin (code[1], tacJoin (code[0], tacCreate (TAC_COPY_VECTOR, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0)));
 			break;
 		case AST_IF:
-			result = makeIf (code);
+			result = makeIf(code);
 			break;
 		case AST_ELSE:
-			result = makeIf (code);
+			result = tacJoin (code[0], tacCreate (TAC_ELSE, code[0] ? code[0]->res : 0, 0, 0));
+			break;
+		case AST_VARIABLE:
+			result = makeVariable (code, node);
+			break;
+		case AST_ACCESS_VECTOR:
+			result = tacJoin (code[0], tacCreate (TAC_VECTOR_INDEX, code[0] ? code[0]->res : 0, 0, 0));
 			break;
 		default:
 			result = tacJoin (code[0], tacJoin (code[1], tacJoin (code[2], code[3])));
