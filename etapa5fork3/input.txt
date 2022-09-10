@@ -28,6 +28,11 @@ int main ()
 
 	read a;
 	read v[b];
-	
+
+	while (i<10)
+    {
+    i <- i+1;
+    };
+
 	c <- mult(3 5);
 }

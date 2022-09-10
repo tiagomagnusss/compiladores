@@ -63,9 +63,7 @@ pronto:
 #define AST_LIST_ELEMENTS_STRING == TAC_PRINT
 #define AST_LIST_ELEMENTS_EXPR == TAC_PRINT
 #define AST_READ == TAC_READ
-
-falta:
-#define AST_WHILE == XX
+#define AST_WHILE == TAC_IFZ TAC_LABEL TAC_JUMP
 */
 
 typedef struct tac_node

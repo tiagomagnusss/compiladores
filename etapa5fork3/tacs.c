@@ -72,7 +72,6 @@ void tacPrint (TAC *tac)
 		case TAC_INIT_VECTOR: fprintf (stderr, "TAC_INIT_VECTOR"); break;
 		case TAC_PRINT: fprintf (stderr, "TAC_PRINT"); break;
 		case TAC_READ: fprintf (stderr, "TAC_READ"); break;
-		/*case TAC_XXX: fprintf (stderr, "TAC_XXX"); break;*/
 		default: fprintf (stderr, "TAC_UNKNOWN"); break;
 	}
 	fprintf (stderr, ", %s", (tac->res) ? tac->res->text : " ");
@@ -180,6 +179,19 @@ TAC *makePrint(TAC *code[], AST *node)
 				return tacJoin (code[0], tacCreate (TAC_PRINT, code[0] ? code[0]->res : 0, 0, 0));
 			}
 	}
+}
+
+TAC *makeWhile (TAC *code[])
+{
+	HASH_NODE* whileLabel = makeLabel();
+	HASH_NODE* jumpLabel = makeLabel();
+
+	TAC *whileTac = tacCreate (TAC_IFZ, jumpLabel, code[0] ? code[0]->res : 0, 0);
+	TAC *whileLabelTac = tacCreate (TAC_LABEL, whileLabel, 0, 0);
+	TAC *jumpTac = tacCreate (TAC_JUMP, whileLabel, 0, 0);
+	TAC *jumpLabelTac = tacCreate (TAC_LABEL, jumpLabel, 0, 0);
+
+	return tacJoin (tacJoin (tacJoin (tacJoin (tacJoin (whileLabelTac, code[0]), whileTac), code[1]), jumpTac), jumpLabelTac);
 }
 
 TAC *generateCode (AST *node)
@@ -291,6 +303,9 @@ TAC *generateCode (AST *node)
 			break;
 		case AST_READ:
 			result = tacJoin(code[0], tacCreate (TAC_READ, node->symbol, code[0] ? code[0]->res : 0, 0));
+			break;
+		case AST_WHILE:
+			result = makeWhile (code);
 			break;
 		default:
 			result = tacJoin (code[0], tacJoin (code[1], tacJoin (code[2], code[3])));
