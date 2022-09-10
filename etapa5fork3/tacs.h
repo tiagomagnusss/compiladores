@@ -39,9 +39,12 @@ Pedro Hoerlle de Oliveira - 00288548
 #define TAC_CALL 27
 #define TAC_CALLRES 28
 #define TAC_RETURN 29
+#define TAC_INIT 30
+#define TAC_INIT_VECTOR 31
+#define TAC_PRINT 32
+#define TAC_READ 33
 
 /*
-
 pronto:
 #define AST_DEC_FUNC == TAC_BEGINFUN TAC_ENDFUN
 #define AST_ATRIB_VARIAVEL == TAC_MOVE
@@ -54,15 +57,15 @@ pronto:
 #define AST_LIST_ARGUMENTS == TAC_ARG
 #define AST_FUNC_CALL == TAC_CALL TAC_CALLRES
 #define AST_RETURN == TAC_RETURN
+#define AST_DEC_VARIABLE == TAC_MOVE
+#define AST_DEC_VECTOR == TAC_INIT_VECTOR
+#define AST_DEC_VECTOR_SIZE == TAC_VECTOR_INDEX
+#define AST_LIST_ELEMENTS_STRING == TAC_PRINT
+#define AST_LIST_ELEMENTS_EXPR == TAC_PRINT
+#define AST_READ == TAC_READ
 
 falta:
-#define AST_DEC_VARIABLE == XX
-#define AST_DEC_VECTOR == XX
-#define AST_DEC_VECTOR_SIZE == XX
 #define AST_WHILE == XX
-#define AST_PRINT == XX
-#define AST_READ == XX
-#define AST_LIST_ELEMENTS_STRING == XX
 */
 
 typedef struct tac_node

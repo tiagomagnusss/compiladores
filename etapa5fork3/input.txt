@@ -1,4 +1,4 @@
-int v [3]'a' 0 0 ;
+int v [3]'a' 1 2 ;
 int a (1);
 
 int mult (int x int y)
@@ -21,5 +21,13 @@ int main ()
 	else
 	g <- 3;
 
+	print v[5];
+  	print a;
+	print "Digite um numero: \n";
+	print "Incrementado algumas vezes a fica " (2+x)a "\n";
+
+	read a;
+	read v[b];
+	
 	c <- mult(3 5);
 }

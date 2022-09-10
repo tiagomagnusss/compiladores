@@ -68,6 +68,10 @@ void tacPrint (TAC *tac)
 		case TAC_CALL: fprintf (stderr, "TAC_CALL"); break;
 		case TAC_CALLRES: fprintf (stderr, "TAC_CALLRES"); break;
 		case TAC_RETURN: fprintf (stderr, "TAC_RETURN"); break;
+		case TAC_INIT: fprintf (stderr, "TAC_INIT"); break;
+		case TAC_INIT_VECTOR: fprintf (stderr, "TAC_INIT_VECTOR"); break;
+		case TAC_PRINT: fprintf (stderr, "TAC_PRINT"); break;
+		case TAC_READ: fprintf (stderr, "TAC_READ"); break;
 		/*case TAC_XXX: fprintf (stderr, "TAC_XXX"); break;*/
 		default: fprintf (stderr, "TAC_UNKNOWN"); break;
 	}
@@ -159,6 +163,25 @@ TAC *makeFunctionCall (TAC *code[], AST *node)
 	tacJoin (tacCreate (TAC_JUMP, node->symbol, 0, 0), tacCreate (TAC_LABEL, newLabel, 0, 0))), tacCreate (TAC_CALLRES, makeTemp(), 0, 0));
 }
 
+TAC *makePrint(TAC *code[], AST *node)
+{
+    if (code[1])
+    {
+        return tacJoin (tacJoin (code[0], tacCreate (TAC_PRINT, code[0] ? code[0]->res : 0, 0, 0)), code[1]);
+    }
+    else
+	{
+		if (node->symbol)
+    		{
+        		return tacJoin (tacCreate (TAC_PRINT, node->symbol, 0, 0), code[0]);
+    		}
+    	else
+			{
+				return tacJoin (code[0], tacCreate (TAC_PRINT, code[0] ? code[0]->res : 0, 0, 0));
+			}
+	}
+}
+
 TAC *generateCode (AST *node)
 {
 	int i;
@@ -233,9 +256,9 @@ TAC *generateCode (AST *node)
 		case AST_VARIABLE:
 			result = makeVariable (code, node);
 			break;
-		case AST_ACCESS_VECTOR:
-			result = tacJoin (code[0], tacCreate (TAC_VECTOR_INDEX, code[0] ? code[0]->res : 0, 0, 0));
-			break;
+		//case AST_ACCESS_VECTOR:
+		//	result = tacJoin (code[0], tacCreate (TAC_VECTOR_INDEX, code[0] ? code[0]->res : 0, 0, 0));
+		//	break;
 		case AST_DEC_FUNC:
 			result = makeFunction (code, node);
 			break;
@@ -250,6 +273,24 @@ TAC *generateCode (AST *node)
 			break;
 		case AST_RETURN:
 			result = tacJoin (code[0], tacCreate (TAC_RETURN, code[0] ? code[0]->res : 0, 0, 0));
+			break;
+		case AST_DEC_VARIABLE:
+			result =  tacJoin (code[1], tacCreate (TAC_MOVE, node->symbol, code[1] ? code[1]->res : 0, 0));
+			break;
+		case AST_DEC_VECTOR:
+			result = tacJoin (code[2] ,tacJoin (code[1], tacCreate (TAC_INIT_VECTOR, node->symbol, code[1] ? code[1]->res : 0, 0)));
+			break;
+		case AST_DEC_VECTOR_SIZE:
+			result = tacJoin (code[0], tacCreate (TAC_VECTOR_INDEX, node->symbol, 0, 0));
+			break;
+		case AST_LIST_ELEMENTS_STRING:
+			result = makePrint (code, node);
+			break;
+		case AST_LIST_ELEMENTS_EXPR:
+			result = makePrint (code, node);
+			break;
+		case AST_READ:
+			result = tacJoin(code[0], tacCreate (TAC_READ, node->symbol, code[0] ? code[0]->res : 0, 0));
 			break;
 		default:
 			result = tacJoin (code[0], tacJoin (code[1], tacJoin (code[2], code[3])));
