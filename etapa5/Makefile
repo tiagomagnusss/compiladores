@@ -2,7 +2,6 @@
 #Tiago de Carvalho Magnus - 00287710
 #Pedro Hoerlle de Oliveira - 00288548
 
-
 #Make 1
 # Makefile for single compiler call
 # All source files must be included from code embedded in scanner.l
@@ -45,11 +44,22 @@
 # But now the hash table is compiled in a separate gcc call
 # Therefore, there must be a header of it to be included in scanner.l
 
-etapa5: y.tab.o lex.yy.o hash.o ast.o tac.o main.o semantic.o
-	gcc -Wall main.o lex.yy.o y.tab.o hash.o ast.o tac.o semantic.o -o etapa5
+SHELL = /bin/sh
 
-main.o: main.c
-	gcc -Wall -c main.c
+etapa5: y.tab.o lex.yy.o hash.o ast.o tacs.o main.o
+	gcc -Wall y.tab.o lex.yy.o hash.o ast.o tacs.o main.o -o etapa5
+
+y.tab.c: parser.y
+	yacc -d parser.y
+
+y.tab.o: y.tab.c
+	gcc -Wall -c y.tab.c
+
+lex.yy.c: scanner.l
+	flex --header-file=lex.yy.h scanner.l
+
+lex.yy.o: lex.yy.c
+	gcc -Wall -c lex.yy.c
 
 hash.o: hash.c
 	gcc -Wall -c hash.c
@@ -57,20 +67,11 @@ hash.o: hash.c
 ast.o: ast.c
 	gcc -Wall -c ast.c
 
-tac.o: tac.c
-	gcc -Wall -c tac.c
+tacs.o: tacs.c
+	gcc -Wall -c tacs.c
 
-y.tab.o: y.tab.c
-	gcc -Wall -c y.tab.c
-
-lex.yy.o: lex.yy.c
-	gcc -Wall -c lex.yy.c
-
-y.tab.c: parser.y
-	yacc -d parser.y
-
-lex.yy.c: scanner.l
-	flex --header-file=lex.yy.h scanner.l
+main.o: main.c
+	gcc -Wall -c main.c
 
 clean:
-	rm -f lex.yy.c lex.yy.h y.tab.c y.tab.h *.o etapa5
+	rm lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa5

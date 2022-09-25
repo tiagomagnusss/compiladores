@@ -46,8 +46,8 @@
 
 SHELL = /bin/sh
 
-etapa5: y.tab.o lex.yy.o hash.o ast.o tacs.o main.o
-	gcc -Wall y.tab.o lex.yy.o hash.o ast.o tacs.o main.o -o etapa5
+etapa6: y.tab.o lex.yy.o hash.o ast.o tacs.o main.o
+	gcc -Wall y.tab.o lex.yy.o hash.o ast.o tacs.o main.o -o etapa6
 
 y.tab.c: parser.y
 	yacc -d parser.y
@@ -74,4 +74,4 @@ main.o: main.c
 	gcc -Wall -c main.c
 
 clean:
-	rm lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa5
+	rm lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa6

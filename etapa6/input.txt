@@ -13,9 +13,9 @@ int main ()
 	t[5] <- h[10];
 	b <- x . (8 + 2);
 	if (a)
-    {
-    	b <- 1;
-    };
+	{
+		b <- 1;
+	};
 	if (a)
 	e <- 2
 	else
@@ -30,9 +30,9 @@ int main ()
 	read v[b];
 
 	while (i<10)
-    {
-    i <- i+1;
-    };
+	{
+	i <- i+1;
+	};
 
 	c <- mult(3 5);
 }

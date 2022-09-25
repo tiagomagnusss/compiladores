@@ -58,10 +58,9 @@ Pedro Hoerlle de Oliveira - 00288548
 
 typedef struct astnode
 {
-    int type;
-    int datatype;
-    HASH_NODE *symbol;
-    struct astnode *son[MAX_SONS];
+	int type;
+	HASH_NODE *symbol;
+	struct astnode *son[MAX_SONS];
 } AST;
 
 AST *astCreate (int type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3);
