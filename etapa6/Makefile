@@ -74,4 +74,9 @@ main.o: main.c
 	gcc -Wall -c main.c
 
 clean:
-	rm lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa6
+	rm -f lex.yy.c lex.yy.h y.tab.c y.tab.h output.txt *.o etapa6
+#	rm -f *.s teste-asm a.out
+
+asm: teste-asm.c
+	gcc -Wall -S teste-asm.c
+	gcc -Wall teste-asm.s -o teste-asm
