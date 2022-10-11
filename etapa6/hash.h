@@ -3,6 +3,7 @@ Trabalho Pratico de Compiladores
 Tiago de Carvalho Magnus - 00287710
 Pedro Hoerlle de Oliveira - 00288548
 */
+#include <stdio.h>
 
 #ifndef HASH_HEADER
 #define HASH_HEADER
@@ -19,6 +20,8 @@ typedef struct hash_node
 	struct hash_node *next;
 } HASH_NODE;
 
+HASH_NODE *Table[HASH_SIZE];
+
 void hashInit (void);
 int hashAddress (char *text);
 HASH_NODE *hashFind (char *text);
@@ -26,5 +29,7 @@ HASH_NODE *hashInsert (char *text, int type);
 void hashPrint (void);
 HASH_NODE *makeTemp (void);
 HASH_NODE *makeLabel (void);
+
+void printAsm(FILE* fout);
 
 #endif

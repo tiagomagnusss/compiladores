@@ -8,6 +8,9 @@ Pedro Hoerlle de Oliveira - 00288548
 #include <stdio.h>
 
 #include "tacs.h"
+#include "ast.h"
+#include "hash.h"
+#include "y.tab.h"
 
 #define MAXSONS 4
 
@@ -158,7 +161,7 @@ TAC *makeFunction (TAC *code[], AST *node)
 TAC *makeFunctionCall (TAC *code[], AST *node)
 {
 	HASH_NODE *newLabel = makeLabel();
-	return tacJoin (tacJoin (tacJoin (tacCreate (TAC_CALL, node->symbol, newLabel, 0), code[0]), 
+	return tacJoin (tacJoin (tacJoin (tacCreate (TAC_CALL, node->symbol, newLabel, 0), code[0]),
 	tacJoin (tacCreate (TAC_JUMP, node->symbol, 0, 0), tacCreate (TAC_LABEL, newLabel, 0, 0))), tacCreate (TAC_CALLRES, makeTemp(), 0, 0));
 }
 
@@ -313,3 +316,89 @@ TAC *generateCode (AST *node)
 	}
 	return result;
 }
+
+// ASM GENERATION
+TAC* tacReverse(TAC* tac) {
+	TAC* t = tac;
+	for ( t = tac; t->prev; t = t->prev){
+		t->prev->next = t;
+	}
+
+	return t;
+}
+
+void generateConstants(FILE* fout){
+	fprintf(fout, "## INIT CONSTANTS\n");
+	for(int i = 0; i < HASH_SIZE; i++) {
+		for(HASH_NODE *aux = Table[i]; aux; aux = aux->next){
+			if (aux->type == LIT_INTEGER || aux->type == LIT_FLOAT){
+				fprintf(fout, "\t.globl	_%s\n"
+											"\t.data\n"
+											"\t.type	_%s, @object\n"
+											"\t.size	_%s, 4\n"
+											"_%s:\n", aux->text, aux->text, aux->text, aux->text);
+
+				if(aux->type == LIT_FLOAT) {
+					fprintf(fout, "\t.float  %s\n", 4);
+				}
+				else if(aux->type == LIT_INTEGER){
+					fprintf(fout, "\t.long   %s\n", 4);
+				}
+			}	else if(aux->type == LIT_CHAR){
+				fprintf(fout, "\t.long   %d\n", aux->text[1]);
+			}
+		}
+	}
+	fprintf(fout, "## FINISH OF CONSTANTS\n\n");
+}
+
+void generateAsm(TAC* first){
+	FILE* fout;
+	fout = fopen("out.s", "w+");
+
+	TAC* tac;
+	fprintf(fout, "## FIXED INIT\n"
+		"\t.section	.rodata\n"
+	".LC0:\n"
+		"\t.string	\"%%d\\n\"\n"
+  	"\t.section	.rodata\n\n");
+
+	generateConstants(fout);
+
+	// Each TAC
+	for (tac = first; tac; tac = tac->next){
+		switch (tac->type) {
+			case TAC_BEGINFUN:
+				if (strcmp(tac->res->text, "main") == 0){
+					fprintf(fout, "## TAC_BEGINFUN\n"
+						"\t.globl %s\n"
+						"\t.type	%s, @function\n"
+					"%s:\n"
+						"\tpushq %%rbp\n"
+						"\tmovq %%rsp, %%rbp\n", tac->res->text, tac->res->text, tac->res->text);
+				} else {
+					fprintf(fout, "## TAC_BEGINFUN\n"
+						"\t.globl _%s\n"
+						"\t.type	_%s, @function\n"
+					"_%s:\n"
+						"\tpushq %%rbp\n"
+						"\tmovq %%rsp, %%rbp\n", tac->res->text, tac->res->text, tac->res->text);
+				}
+				break;
+			case TAC_ENDFUN:
+				fprintf(fout, "\tpopq %%rbp\n"
+					"\tretq\n\n"
+					"## TAC_ENDFUN\n\n");
+				break;
+			case TAC_PRINT:
+				fprintf(fout, "## TAC_PRINT\n");
+				break;
+		}
+	}
+
+	// Hash Table
+	printAsm(fout);
+
+	fclose(fout);
+}
+

@@ -10,8 +10,6 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #include "hash.h"
 
-HASH_NODE *Table[HASH_SIZE];
-
 void hashInit (void)
 {
 	int i;
@@ -71,12 +69,30 @@ void hashPrint (void)
 {
 	int i;
 	HASH_NODE *node;
-	
+
 	for (i = 0; i < HASH_SIZE; ++i)
 	{
 		for (node = Table[i]; node; node = node->next)
 		{
 			printf ("Table[%d] has %s\n",i,node->text);
+		}
+	}
+}
+
+void printAsm(FILE* fout){
+	int i;
+	HASH_NODE *node;
+
+	fprintf(fout, "## DATA SECTION\n\n");
+
+	for (i = 0; i < HASH_SIZE; ++i)
+	{
+		for (node = Table[i]; node; node = node->next)
+		{
+			if (node->type == SYMBOL_VARIABLE)
+			{
+				fprintf(fout, "_%s:\t.long\t0\n", node->text);
+			}
 		}
 	}
 }

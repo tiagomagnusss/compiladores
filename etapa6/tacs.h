@@ -76,10 +76,13 @@ typedef struct tac_node
 	struct tac_node *next;
 } TAC;
 
-TAC *tacCreate (int type, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2);
+TAC* tacCreate (int type, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2);
 void tacPrint (TAC *tac);
 void tacPrintBackwards (TAC *tac);
 TAC *tacJoin (TAC *l1, TAC *l2);
 TAC *generateCode (AST *node);
+
+TAC *tacReverse(TAC* tac);
+void generateAsm(TAC* first);
 
 #endif
