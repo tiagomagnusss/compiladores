@@ -329,41 +329,57 @@ TAC* tacReverse(TAC* tac) {
 
 void generateConstants(FILE* fout){
 	fprintf(fout, "## INIT CONSTANTS\n");
+
 	for(int i = 0; i < HASH_SIZE; i++) {
 		for(HASH_NODE *aux = Table[i]; aux; aux = aux->next){
-			if (aux->type == LIT_INTEGER || aux->type == LIT_FLOAT){
+			if (aux->type == LIT_FLOAT) {
+				//?
+			} else if (aux->type == LIT_INTEGER || aux->type == LIT_CHAR) {
 				fprintf(fout, "\t.globl	_%s\n"
-											"\t.data\n"
-											"\t.type	_%s, @object\n"
-											"\t.size	_%s, 4\n"
-											"_%s:\n", aux->text, aux->text, aux->text, aux->text);
-
-				if(aux->type == LIT_FLOAT) {
-					fprintf(fout, "\t.float  %s\n", 4);
-				}
-				else if(aux->type == LIT_INTEGER){
-					fprintf(fout, "\t.long   %s\n", 4);
-				}
-			}	else if(aux->type == LIT_CHAR){
-				fprintf(fout, "\t.long   %d\n", aux->text[1]);
+										"\t.data\n"
+										"\t.type	_%s, @object\n"
+										"\t.size	_%s, 4\n"
+										"_%s:\n", aux->text, aux->text, aux->text, aux->text);
+				fprintf(fout, "\t.long   %s\n", aux->text);
 			}
 		}
 	}
 	fprintf(fout, "## FINISH OF CONSTANTS\n\n");
 }
 
-void generateAsm(TAC* first){
+void generateData(FILE* fout, AST* node){
+	if(!node) return;
+	static int LC = 2;
+
+	if (node->type == AST_LIST_ELEMENTS_STRING){
+		fprintf(fout, "\t.section\t .rodata\n"
+			".LC%d:\n"
+				"\t.string %s \n", LC, node->symbol->text);
+		LC++;
+	}
+
+	for(int i = 0; i < MAX_SONS; i++){
+		generateData(fout, node->son[i]);
+	}
+}
+
+void generateAsm(TAC* first, AST* ast){
 	FILE* fout;
+	int LC = 2;
 	fout = fopen("out.s", "w+");
 
 	TAC* tac;
 	fprintf(fout, "## FIXED INIT\n"
 		"\t.section	.rodata\n"
 	".LC0:\n"
-		"\t.string	\"%%d\\n\"\n"
-  	"\t.section	.rodata\n\n");
+		"\t.string	\"%%d\"\n"
+  	"\t.section	.rodata\n"
+	".LC1:\n"
+		"\t.string	\"%%f\"\n"
+		"\t.section\t .rodata\n");
 
 	generateConstants(fout);
+	generateData(fout, ast);
 
 	// Each TAC
 	for (tac = first; tac; tac = tac->next){
@@ -391,7 +407,25 @@ void generateAsm(TAC* first){
 					"## TAC_ENDFUN\n\n");
 				break;
 			case TAC_PRINT:
-				fprintf(fout, "## TAC_PRINT\n");
+				if (tac->res->text[0] == '\"'){
+					fprintf(fout, "## TAC_PRINT STRING\n"
+												"\tleaq	.LC%d(%%rip), %%rdi\n"
+												"\tmovl	$0, %%eax\n"
+												"\tcall	printf@PLT\n", LC++);
+				} else if (tac->res->type == LIT_FLOAT) {
+					// ?
+				} else if (tac->res->type == LIT_CHAR){
+					fprintf(fout, "## TAC_PRINT CHAR\n"
+												"\tmovl	$%d, %%edi\n"
+												"\tcall	putchar@PLT\n", tac->res->text[1]);
+				} else {
+					fprintf(fout, "## TAC_PRINT INT\n"
+												"\tmovl	_%s(%%rip), %%eax\n"
+                        "\tmovl	%%eax, %%esi\n"
+                        "\tleaq	.LC0(%%rip), %%rdi\n"
+                        "\tmovl	$0, %%eax\n"
+                        "\tcall	printf@PLT\n", tac->res->text);
+				}
 				break;
 		}
 	}

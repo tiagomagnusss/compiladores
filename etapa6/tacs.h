@@ -83,6 +83,6 @@ TAC *tacJoin (TAC *l1, TAC *l2);
 TAC *generateCode (AST *node);
 
 TAC *tacReverse(TAC* tac);
-void generateAsm(TAC* first);
+void generateAsm(TAC* first, AST* ast);
 
 #endif

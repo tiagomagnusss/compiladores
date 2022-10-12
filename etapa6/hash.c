@@ -85,13 +85,16 @@ void printAsm(FILE* fout){
 
 	fprintf(fout, "## DATA SECTION\n\n");
 
-	for (i = 0; i < HASH_SIZE; ++i)
-	{
-		for (node = Table[i]; node; node = node->next)
-		{
-			if (node->type == SYMBOL_VARIABLE)
-			{
-				fprintf(fout, "_%s:\t.long\t0\n", node->text);
+	for(int i = 0; i < HASH_SIZE; i++) {
+		for(node = Table[i]; node; node = node->next){
+			if (strncmp(node->text, "Temp", 4) == 0){
+				fprintf(fout, "\t.globl	_%s\n"
+										 "\t.data\n"
+										 "\t.type	_%s, @object\n"
+										 "\t.size	_%s, 4\n"
+										 "_%s:\n", node->text, node->text, node->text, node->text);
+
+				fprintf(fout, "\t.long  0\n");
 			}
 		}
 	}
