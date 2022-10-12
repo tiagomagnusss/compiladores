@@ -427,6 +427,36 @@ void generateAsm(TAC* first, AST* ast){
                         "\tcall	printf@PLT\n", tac->res->text);
 				}
 				break;
+			case TAC_ADD:
+			case TAC_SUB:
+			case TAC_DIV:
+			case TAC_MUL:
+			case TAC_LT:
+			case TAC_GT:
+			case TAC_LE:
+			case TAC_GE:
+			case TAC_EQ:
+			case TAC_DIF:
+			case TAC_AND:
+			case TAC_OR:
+			case TAC_NOT:
+			case TAC_MOVE:
+			case TAC_MOVE_VECTOR:
+			case TAC_IFZ:
+			case TAC_LABEL:
+			case TAC_JUMP:
+			case TAC_VECTOR_INDEX:
+			case TAC_VARIABLE_VECTOR:
+			case TAC_ELSE:
+			case TAC_PARAM:
+			case TAC_ARG:
+			case TAC_CALL:
+			case TAC_CALLRES:
+			case TAC_RETURN:
+			case TAC_INIT:
+			case TAC_INIT_VECTOR:
+			case TAC_READ:
+				break;
 		}
 	}
 
