@@ -331,7 +331,7 @@ void generateConstants(FILE* fout){
 	fprintf(fout, "## INIT CONSTANTS\n");
 
 	for(int i = 0; i < HASH_SIZE; i++) {
-		for(HASH_NODE *node = Table[i]; node; node = node->next){
+		for(HASH_NODE *node = getTable(); node; node = node->next){
 			if (node->type == LIT_FLOAT) {
 				//?
 			} else if (node->type == LIT_INTEGER || node->type == LIT_CHAR) {

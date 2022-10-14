@@ -10,6 +10,8 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #include "hash.h"
 
+HASH_NODE* Table[HASH_SIZE];
+
 void hashInit (void)
 {
 	int i;
@@ -113,4 +115,8 @@ HASH_NODE *makeLabel (void)
 	char buffer[256] = "";
 	sprintf (buffer, "Label%d", serialNumber++);
 	return hashInsert (buffer, SYMBOL_LABEL);
+}
+
+HASH_NODE** getTable(){
+	return Table;
 }

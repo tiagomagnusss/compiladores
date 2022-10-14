@@ -20,7 +20,7 @@ typedef struct hash_node
 	struct hash_node *next;
 } HASH_NODE;
 
-HASH_NODE *Table[HASH_SIZE];
+//HASH_NODE *Table[HASH_SIZE];
 
 void hashInit (void);
 int hashAddress (char *text);
@@ -31,5 +31,7 @@ HASH_NODE *makeTemp (void);
 HASH_NODE *makeLabel (void);
 
 void printAsm(FILE* fout);
+
+HASH_NODE** getTable();
 
 #endif
