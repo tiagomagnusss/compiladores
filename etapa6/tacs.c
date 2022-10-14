@@ -616,6 +616,13 @@ void generateAsm(TAC* first, AST* ast){
 											"\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
 				break;
 			case TAC_MOVE_VECTOR:
+				fprintf(fout, "## TAC_MOVE_VECTOR\n"
+								"\tmovl	_%s(%%rip), %%edx\n"
+								"\tmovl	_%s(%%rip), %%eax\n"
+								"\tmovslq	%%edx, %%rdx\n"
+								"\tleaq	0(,%%rdx,4), %%rcx\n"
+								"\tleaq	_%s(%%rip), %%rdx\n"
+								"\tmovl	%%eax, (%%rcx,%%rdx)\n", tac->op1->text, tac->op2->text, tac->res->text);
 				break;
 			case TAC_IFZ:
 				fprintf(fout, "## TAC_IFZ\n"
@@ -635,6 +642,13 @@ void generateAsm(TAC* first, AST* ast){
 			case TAC_VECTOR_INDEX:
 				break;
 			case TAC_VARIABLE_VECTOR:
+				fprintf(fout, "## TAC_VARIABLE_VECTOR\n"
+											"\tmovl	_%s(%%rip), %%eax\n"
+											"\tcltq\n"
+											"\tleaq	0(,%%rax,4), %%rdx\n"
+											"\tleaq	_%s(%%rip), %%rax\n"
+											"\tmovl	(%%rdx,%%rax), %%ebx	\n"
+											"\tmovl	%%ebx, _%s(%%rip)\n", tac->op2->text, tac->op1->text, tac->res->text);
 				break;
 			case TAC_ELSE:
 				fprintf(fout, "## TAC_ELSE\n");
