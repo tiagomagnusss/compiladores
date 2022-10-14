@@ -361,6 +361,17 @@ void generateData(FILE* fout, AST* node){
 										"_%s:\n", node->symbol->text, node->symbol->text,
 										node->symbol->text, node->symbol->text);
 		fprintf(fout, "\t.long   %s\n", node->son[1]->symbol->text);
+	} else if (node->type == AST_DEC_VECTOR){
+    fprintf(fout, "\t.globl	_%s\n"
+									"\t.data\n"
+									"\t.type	_%s, @object\n"
+									"\t.size	_%s, %d\n"
+									"_%s:\n", node->symbol->text, node->symbol->text, node->symbol->text,
+									4*atoi(node->son[1]->symbol->text), node->symbol->text);
+
+    for(AST* child = node->son[2]; child; child = child->son[1]) {
+			fprintf(fout, "\t.long	%s\n", child->son[0]->symbol->text);
+    }
 	} else if (node->type == AST_LIST_ELEMENTS_STRING){
 		fprintf(fout, "\t.section\t .rodata\n"
 			".LC%d:\n"
@@ -605,6 +616,7 @@ void generateAsm(TAC* first, AST* ast){
 											"\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
 				break;
 			case TAC_MOVE_VECTOR:
+				break;
 			case TAC_IFZ:
 				fprintf(fout, "## TAC_IFZ\n"
 											"\tmovl _%s(%%rip), %%eax\n"
@@ -613,7 +625,7 @@ void generateAsm(TAC* first, AST* ast){
 											"\tjz .%s\n", tac->op1->text, tac->res->text);
 				break;
 			case TAC_LABEL:
-				fprintf(fout, "## TAC_IFZ\n"
+				fprintf(fout, "## TAC_LABEL\n"
 											".%s:\n", tac->res->text);
 				break;
 			case TAC_JUMP:
@@ -621,10 +633,16 @@ void generateAsm(TAC* first, AST* ast){
 											"\tjmp .%s\n", tac->res->text);
 				break;
 			case TAC_VECTOR_INDEX:
+				break;
 			case TAC_VARIABLE_VECTOR:
+				break;
 			case TAC_ELSE:
+				fprintf(fout, "## TAC_ELSE\n");
+				break;
 			case TAC_PARAM:
+				break;
 			case TAC_ARG:
+				break;
 			case TAC_CALL:
 				fprintf(fout, "## TAC_CALL\n"
 											"\tcall	_%s\n"
@@ -636,13 +654,14 @@ void generateAsm(TAC* first, AST* ast){
 											"\tpopq	%%rbp\n"
 											"\tret\n", tac->res->text);
 				break;
-			case TAC_INIT: // feito pelo generateData
-			case TAC_INIT_VECTOR:
 			case TAC_READ:
 				fprintf(fout, "## TAC_READ\n"
-											"\tmovl	_%s, %%esi\n"
-											"\tmovl	.LC0, %%edi\n"
-											"\tcall	__isoc99_scanf\n", tac->res->text);
+											"\tleaq	_%s(%%rip), %%rsi\n"
+											"\tleaq	.LC0(%%rip), %%rdi\n"
+											"\tmovl	$0, %%eax\n"
+											"\tcall	__isoc99_scanf@PLT\n", tac->res->text);
+				break;
+			default:
 				break;
 		}
 	}
