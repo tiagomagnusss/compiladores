@@ -351,7 +351,14 @@ void generateData(FILE* fout, AST* node){
 	if(!node) return;
 	static int LC = 2;
 
-	if (node->type == AST_LIST_ELEMENTS_STRING){
+	if (node->type == AST_VARIABLE){
+		fprintf(fout, "\t.globl	_%s\n"
+										"\t.data\n"
+										"\t.type	_%s, @object\n"
+										"\t.size	_%s, 4\n"
+										"_%s:\n", aux->text, aux->text, aux->text, aux->text);
+		fprintf(fout, "\t.long   %s\n", aux->text);
+	} else if (node->type == AST_LIST_ELEMENTS_STRING){
 		fprintf(fout, "\t.section\t .rodata\n"
 			".LC%d:\n"
 				"\t.string %s \n", LC, node->symbol->text);
