@@ -331,16 +331,16 @@ void generateConstants(FILE* fout){
 	fprintf(fout, "## INIT CONSTANTS\n");
 
 	for(int i = 0; i < HASH_SIZE; i++) {
-		for(HASH_NODE *aux = Table[i]; aux; aux = aux->next){
-			if (aux->type == LIT_FLOAT) {
+		for(HASH_NODE *node = Table[i]; node; node = node->next){
+			if (node->type == LIT_FLOAT) {
 				//?
-			} else if (aux->type == LIT_INTEGER || aux->type == LIT_CHAR) {
+			} else if (node->type == LIT_INTEGER || node->type == LIT_CHAR) {
 				fprintf(fout, "\t.globl	_%s\n"
 										"\t.data\n"
 										"\t.type	_%s, @object\n"
 										"\t.size	_%s, 4\n"
-										"_%s:\n", aux->text, aux->text, aux->text, aux->text);
-				fprintf(fout, "\t.long   %s\n", aux->text);
+										"_%s:\n", node->text, node->text, node->text, node->text, node->text);
+				fprintf(fout, "\t.long  %s\n", node->text);
 			}
 		}
 	}
@@ -358,7 +358,7 @@ void generateData(FILE* fout, AST* node){
 										"\t.size	_%s, 4\n"
 										"_%s:\n", node->symbol->text, node->symbol->text,
 										node->symbol->text, node->symbol->text);
-		fprintf(fout, "\t.long   %s\n", node->symbol->text);
+		// fprintf(fout, "\t.long   %s\n", node->symbol->text);
 	} else if (node->type == AST_LIST_ELEMENTS_STRING){
 		fprintf(fout, "\t.section\t .rodata\n"
 			".LC%d:\n"
@@ -378,7 +378,6 @@ void generateAsm(TAC* first, AST* ast){
 
 	TAC* tac;
 	fprintf(fout, "## FIXED INIT\n"
-		"\t.section	.rodata\n"
 	".LC0:\n"
 		"\t.string	\"%%d\"\n"
   	"\t.section	.rodata\n"
@@ -436,6 +435,12 @@ void generateAsm(TAC* first, AST* ast){
 				}
 				break;
 			case TAC_ADD:
+				fprintf(fout, "## TAC_ADD\n"
+											"\tmovl _%s(%%rip), %%eax\n"
+											"\tmovl _%s(%%rip), %%edx\n"
+											"\taddl %%eax, %%edx\n"
+											"\tmovl %%edx, _%s(%%rip)\n", tac->op1->text, tac->op2->text, tac->res->text);
+				break;
 			case TAC_SUB:
 			case TAC_DIV:
 			case TAC_MUL:
@@ -449,6 +454,10 @@ void generateAsm(TAC* first, AST* ast){
 			case TAC_OR:
 			case TAC_NOT:
 			case TAC_MOVE:
+				fprintf(fout,  "## TAC_MOVE\n"
+											"\tmovl _%s(%%rip), %%eax\n"
+											"\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
+				break;
 			case TAC_MOVE_VECTOR:
 			case TAC_IFZ:
 			case TAC_LABEL:

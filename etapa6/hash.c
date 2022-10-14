@@ -80,7 +80,6 @@ void hashPrint (void)
 }
 
 void printAsm(FILE* fout){
-	int i;
 	HASH_NODE *node;
 
 	fprintf(fout, "## DATA SECTION\n\n");
