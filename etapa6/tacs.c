@@ -358,7 +358,7 @@ void generateData(FILE* fout, AST* node){
 										"\t.size	_%s, 4\n"
 										"_%s:\n", node->symbol->text, node->symbol->text,
 										node->symbol->text, node->symbol->text);
-		// fprintf(fout, "\t.long   %s\n", node->symbol->text);
+		fprintf(fout, "\t.long   %s\n", node->son[1]->symbol->text);
 	} else if (node->type == AST_LIST_ELEMENTS_STRING){
 		fprintf(fout, "\t.section\t .rodata\n"
 			".LC%d:\n"
