@@ -6,6 +6,7 @@ Pedro Hoerlle de Oliveira - 00288548
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "tacs.h"
 #include "ast.h"
@@ -284,7 +285,8 @@ TAC *generateCode (AST *node)
 			result = tacJoin (tacJoin (code[0], tacCreate (TAC_ARG, code[0]->res, 0, 0)), code[1]);
 			break;
 		case AST_FUNC_CALL:
-			result = makeFunctionCall (code, node);
+			//result = makeFunctionCall (code, node);
+			result = tacJoin (code[0], tacCreate (TAC_CALL, makeTemp(), node->symbol, 0));
 			break;
 		case AST_RETURN:
 			result = tacJoin (code[0], tacCreate (TAC_RETURN, code[0] ? code[0]->res : 0, 0, 0));
@@ -339,7 +341,7 @@ void generateConstants(FILE* fout){
 										"\t.data\n"
 										"\t.type	_%s, @object\n"
 										"\t.size	_%s, 4\n"
-										"_%s:\n", node->text, node->text, node->text, node->text, node->text);
+										"_%s:\n", node->text, node->text, node->text, node->text);
 				fprintf(fout, "\t.long  %s\n", node->text);
 			}
 		}
