@@ -281,7 +281,8 @@ TAC *generateCode (AST *node)
 			result = tacJoin (tacJoin (code[0], tacCreate (TAC_ARG, code[0]->res, 0, 0)), code[1]);
 			break;
 		case AST_FUNC_CALL:
-			result = makeFunctionCall (code, node);
+			//result = makeFunctionCall (code, node);
+			result = tacJoin (code[0], tacCreate (TAC_CALL, makeTemp(), node->symbol, 0));
 			break;
 		case AST_RETURN:
 			result = tacJoin (code[0], tacCreate (TAC_RETURN, code[0] ? code[0]->res : 0, 0, 0));
